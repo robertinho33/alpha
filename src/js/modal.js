@@ -1,33 +1,54 @@
-import { updateDoc } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-firestore.js";
-import { ComandaManager } from './comandas.js';
+import { doc, updateDoc } from './firebase.js';
 
 export class ModalPagamento {
-    static modal = document.getElementById('modalPagamento');
-    static form = document.getElementById('formPagamento');
+    static abrir(docRef) {
+        const modal = document.getElementById("modalPagamento");
+        if (modal) {
+            modal.style.display = "block";
 
-    static abrir(docRef, db) {
-        this.modal.style.display = 'block';
-        this.form.onsubmit = async (event) => {
-            event.preventDefault();
-            await this.fecharComanda(docRef, db);
-        };
-    }
+            const form = document.getElementById("formPagamento");
+            form.onsubmit = async (e) => {
+                e.preventDefault();
+                const formaPagamento = document.getElementById("formaPagamento").value;
+                const bandeira = (formaPagamento === "Cartão de Crédito" || formaPagamento === "Cartão de Débito") 
+                    ? document.getElementById("bandeiraPagamento").value 
+                    : null;
 
-    static async fecharComanda(docRef, db) {
-        try {
-            await updateDoc(docRef, {
-                status: "fechada",
-                formaPagamento: document.getElementById('formaPagamento').value,
-                fechadoEm: new Date()
-            });
-            this.modal.style.display = 'none';
-            await ComandaManager.carregarComandas(db);
-        } catch (error) {
-            console.error("Erro ao fechar comanda:", error);
+                try {
+                    await updateDoc(docRef, {
+                        status: "fechada",
+                        formaPagamento: formaPagamento,
+                        bandeira: bandeira || null,
+                        fechadoEm: new Date()
+                    });
+                    alert("Comanda fechada com sucesso!");
+                    this.fechar();
+                    // Recarregar as comandas após fechar
+                    await ComandaManager.carregarComandas();
+                } catch (error) {
+                    console.error("Erro ao fechar comanda:", error);
+                    alert("Erro ao fechar comanda.");
+                }
+            };
+            
+        }// ... resto do código
+document.addEventListener('click', (e) => {
+    if (e.target.classList.contains('fecharComanda')) {
+        const btn = e.target;
+        if (btn.dataset.status === "aberta") {
+            ModalPagamento.abrir(doc(db, "comandas", btn.dataset.id));
         }
+    }
+});
     }
 
     static fechar() {
-        this.modal.style.display = 'none';
+        const modal = document.getElementById("modalPagamento");
+        if (modal) {
+            modal.style.display = "none";
+        }
     }
 }
+
+// Importar ComandaManager para usar carregarComandas
+import { ComandaManager } from './comandas.js';
