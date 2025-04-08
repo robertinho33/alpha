@@ -39,6 +39,22 @@ document.addEventListener('DOMContentLoaded', () => {
             const userData = await getUserData(user.uid);
             console.log('Role:', role, 'Dados do usuário:', userData);
 
+            // Se não houver role (documento ausente), deslogar e redirecionar
+            if (!role) {
+                console.error('Usuário autenticado mas sem documento no Firestore:', user.uid);
+                alert('Seu perfil não está configurado. Entre em contato com o administrador.');
+                await logoutUser(); // Desloga o usuário
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // Se o role não estiver mapeado em defaultPages, negar acesso
+            if (!defaultPages[role]) {
+                console.error('Papel do usuário não mapeado:', role);
+                window.location.href = 'acesso-negado.html';
+                return;
+            }
+
             if (userInfo) {
                 userInfo.textContent = userData && userData.nome ? `${userData.nome} (${role})` : `Usuário sem nome (${role})`;
             }
@@ -55,11 +71,11 @@ document.addEventListener('DOMContentLoaded', () => {
             // Verificar permissões
             if (!allowedPages[page]?.includes(role) && !allowedPages[page]?.includes('todos')) {
                 console.log('Acesso negado. Redirecionando para página padrão:', defaultPages[role]);
-                window.location.href = defaultPages[role] || 'acesso-negado.html';
+                window.location.href = defaultPages[role];
                 return;
             }
 
-            // Redirecionar para a página padrão apenas se estiver em index.html
+            // Redirecionar para a página padrão apenas se estiver em index.html ou register.html
             if (page === 'index.html' || page === 'register.html') {
                 console.log('Redirecionando para página padrão:', defaultPages[role]);
                 window.location.href = defaultPages[role];
@@ -141,14 +157,30 @@ document.addEventListener('DOMContentLoaded', () => {
             const password = document.getElementById('cadastroPassword').value;
             const role = document.getElementById('cadastroTipo').value;
 
+            console.log('Dados do formulário:', { nome, email, password, role });
+
+            if (!nome || !email || !password || !role) {
+                console.error('Campos obrigatórios estão vazios');
+                alert('Por favor, preencha todos os campos.');
+                return;
+            }
+
             try {
-                await registerUser(email, password, nome, role);
+                const user = await registerUser(email, password, nome, role);
+                console.log('Usuário cadastrado com UID:', user.uid);
                 alert('Usuário cadastrado com sucesso!');
                 cadastroForm.reset();
-                // Não redireciona aqui, deixa o usuário na página de cadastro
             } catch (error) {
-                console.error('Erro ao cadastrar usuário:', error);
-                alert('Erro ao cadastrar: ' + error.message);
+                console.error('Erro ao cadastrar usuário:', error.code, error.message);
+                if (error.code === 'auth/email-already-in-use') {
+                    alert('Este email já está em uso. Por favor, use um email diferente ou faça login.');
+                } else if (error.code === 'auth/weak-password') {
+                    alert('A senha é muito fraca. Use pelo menos 6 caracteres.');
+                } else if (error.code === 'auth/invalid-email') {
+                    alert('O email fornecido é inválido. Verifique o formato.');
+                } else {
+                    alert('Erro ao cadastrar: ' + error.message);
+                }
             }
         });
     }
@@ -165,7 +197,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Funções de carregamento permanecem iguais
+// Funções de carregamento (mantidas iguais)
 async function carregarDashboard(user, role) { /* ... */ }
 async function carregarComandas(user, role) { /* ... */ }
 async function carregarProdutos(user, role) { /* ... */ }

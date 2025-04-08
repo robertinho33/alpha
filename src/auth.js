@@ -3,21 +3,26 @@ import { auth, db } from './firebase.js';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updatePassword } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 import { doc, setDoc, getDoc, getDocs, collection } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
+// src/auth.js (função registerUser)
 export async function registerUser(email, password, nome, role = "funcionario") {
     try {
+        console.log('Iniciando cadastro do usuário:', { email, nome, role });
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
+        console.log('Usuário criado no Authentication:', user.uid);
 
-        await setDoc(doc(db, "users", user.uid), {
+        const userDoc = doc(db, "users", user.uid);
+        await setDoc(userDoc, {
             email: email,
             nome: nome,
             role: role,
             createdAt: new Date().toISOString()
         }, { merge: true });
+        console.log('Dados salvos no Firestore para UID:', user.uid);
 
         return user;
     } catch (error) {
-        console.error("Erro ao cadastrar usuário:", error);
+        console.error("Erro ao cadastrar usuário:", error.code, error.message);
         throw error;
     }
 }
