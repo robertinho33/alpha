@@ -1,4 +1,244 @@
-// userpluss/main.js
+// src/main.js
+import { auth, db } from './firebase.js';
+import { registerUser, registerFirstAdmin, loginUser, logoutUser, onAuthStateChanged, getUserRole, getUserData, hasUsers } from './auth.js';
+import { collection, addDoc, getDocs, query, where, orderBy, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+// src/main.js (função carregarComandas)
+async function carregarComandas(user, role) {
+    const serviceSelect = document.getElementById('comandaService');
+    const productSelect = document.getElementById('comandaProduct');
+    const addServiceBtn = document.getElementById('addService');
+    const addProductBtn = document.getElementById('addProduct');
+    const comandaItems = document.getElementById('comandaItems');
+    const comandaTotal = document.getElementById('comandaTotal');
+    const saveComandaBtn = document.getElementById('saveComanda');
+
+    let items = [];
+    let total = 0;
+
+    // Preencher serviços
+    const servicesSnapshot = await getDocs(collection(db, 'services'));
+    servicesSnapshot.forEach(doc => {
+        const option = document.createElement('option');
+        option.value = doc.id;
+        option.textContent = `${doc.data().name} (R$${doc.data().price.toFixed(2)})`;
+        option.dataset.price = doc.data().price;
+        serviceSelect.appendChild(option);
+    });
+
+    // Preencher produtos
+    const productsSnapshot = await getDocs(collection(db, 'products'));
+    productsSnapshot.forEach(doc => {
+        const option = document.createElement('option');
+        option.value = doc.id;
+        option.textContent = `${doc.data().name} (R$${doc.data().price.toFixed(2)})`;
+        option.dataset.price = doc.data().price;
+        productSelect.appendChild(option);
+    });
+
+    // Adicionar serviço
+    addServiceBtn.addEventListener('click', () => {
+        const selectedOption = serviceSelect.options[serviceSelect.selectedIndex];
+        const price = parseFloat(selectedOption.dataset.price);
+        items.push({ type: 'service', id: selectedOption.value, name: selectedOption.textContent.split(' (')[0], price });
+        updateComanda();
+    });
+
+    // Adicionar produto
+    addProductBtn.addEventListener('click', () => {
+        const selectedOption = productSelect.options[productSelect.selectedIndex];
+        const price = parseFloat(selectedOption.dataset.price);
+        items.push({ type: 'product', id: selectedOption.value, name: selectedOption.textContent.split(' (')[0], price });
+        updateComanda();
+    });
+
+    // Atualizar tabela e total
+    function updateComanda() {
+        comandaItems.innerHTML = '';
+        total = 0;
+        items.forEach((item, index) => {
+            total += item.price;
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${item.type === 'service' ? 'Serviço' : 'Produto'}</td>
+                <td>${item.name}</td>
+                <td>R$${item.price.toFixed(2)}</td>
+                <td><button class="btn btn-danger btn-sm" data-index="${index}">Remover</button></td>
+            `;
+            comandaItems.appendChild(row);
+        });
+        comandaTotal.textContent = total.toFixed(2);
+
+        // Remover item
+        comandaItems.querySelectorAll('.btn-danger').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const index = parseInt(btn.dataset.index);
+                items.splice(index, 1);
+                updateComanda();
+            });
+        });
+    }
+
+    // Salvar comanda
+    saveComandaBtn.addEventListener('click', async () => {
+        try {
+            await addDoc(collection(db, 'comandas'), {
+                items,
+                total,
+                createdAt: new Date().toISOString(),
+                createdBy: user.uid
+            });
+            alert('Comanda salva com sucesso!');
+            items = [];
+            updateComanda();
+        } catch (error) {
+            console.error('Erro ao salvar comanda:', error);
+            alert('Erro ao salvar comanda: ' + error.message);
+        }
+    });
+}
+document.addEventListener('DOMContentLoaded', () => {
+    // ... (código existente mantido até onAuthStateChanged)
+
+    onAuthStateChanged(auth, async (user) => {
+        // ... (código existente mantido)
+
+        if (user) {
+            // ... (código existente mantido)
+
+            if (page === 'services.html') carregarServicos(user, role);
+            if (page === 'products.html') carregarProdutos(user, role);
+            if (page === 'schedules.html') carregarAgendamentos(user, role);
+            if (page === 'comandas.html') carregarComandas(user, role);
+        }
+    });
+
+    // ... (eventos existentes mantidos: loginForm, registerForm, cadastroForm, alterarSenhaForm)
+
+    // Cadastro de serviços
+    const serviceForm = document.getElementById('serviceForm');
+    if (serviceForm) {
+        serviceForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('serviceName').value;
+            const description = document.getElementById('serviceDescription').value;
+            const price = parseFloat(document.getElementById('servicePrice').value);
+            const duration = parseInt(document.getElementById('serviceDuration').value);
+            const professionalType = document.getElementById('serviceProfessionalType').value;
+
+            try {
+                await addDoc(collection(db, 'services'), {
+                    name,
+                    description,
+                    price,
+                    duration,
+                    professionalType,
+                    createdAt: new Date().toISOString(),
+                    createdBy: auth.currentUser.uid
+                });
+                alert('Serviço cadastrado com sucesso!');
+                serviceForm.reset();
+            } catch (error) {
+                console.error('Erro ao cadastrar serviço:', error);
+                alert('Erro ao cadastrar serviço: ' + error.message);
+            }
+        });
+    }
+
+    // Cadastro de produtos
+    const productForm = document.getElementById('productForm');
+    if (productForm) {
+        productForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('productName').value;
+            const description = document.getElementById('productDescription').value;
+            const price = parseFloat(document.getElementById('productPrice').value);
+            const stock = parseInt(document.getElementById('productStock').value);
+
+            try {
+                await addDoc(collection(db, 'products'), {
+                    name,
+                    description,
+                    price,
+                    stock,
+                    createdAt: new Date().toISOString(),
+                    createdBy: auth.currentUser.uid
+                });
+                alert('Produto cadastrado com sucesso!');
+                productForm.reset();
+            } catch (error) {
+                console.error('Erro ao cadastrar produto:', error);
+                alert('Erro ao cadastrar produto: ' + error.message);
+            }
+        });
+    }
+
+    // Cadastro de agendamentos
+    const scheduleForm = document.getElementById('scheduleForm');
+    if (scheduleForm) {
+        scheduleForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const serviceId = document.getElementById('scheduleService').value;
+            const professionalId = document.getElementById('scheduleProfessional').value;
+            const clientName = document.getElementById('scheduleClient').value;
+            const dateTime = document.getElementById('scheduleDateTime').value;
+
+            try {
+                await addDoc(collection(db, 'schedules'), {
+                    serviceId,
+                    professionalId,
+                    clientName,
+                    dateTime: new Date(dateTime).toISOString(),
+                    status: 'pending',
+                    createdAt: new Date().toISOString(),
+                    createdBy: auth.currentUser.uid
+                });
+                alert('Agendamento realizado com sucesso!');
+                scheduleForm.reset();
+            } catch (error) {
+                console.error('Erro ao cadastrar agendamento:', error);
+                alert('Erro ao cadastrar agendamento: ' + error.message);
+            }
+        });
+    }
+});
+
+// Funções de carregamento
+async function carregarServicos(user, role) {
+    // Lógica adicional se necessário (ex.: listar serviços)
+}
+
+async function carregarProdutos(user, role) {
+    // Lógica adicional se necessário (ex.: listar produtos)
+}
+
+async function carregarAgendamentos(user, role) {
+    const serviceSelect = document.getElementById('scheduleService');
+    const professionalSelect = document.getElementById('scheduleProfessional');
+
+    // Preencher serviços
+    const servicesSnapshot = await getDocs(collection(db, 'services'));
+    servicesSnapshot.forEach(doc => {
+        const option = document.createElement('option');
+        option.value = doc.id;
+        option.textContent = doc.data().name;
+        serviceSelect.appendChild(option);
+    });
+
+    // Preencher profissionais (apenas funcionários)
+    const professionalsSnapshot = await getDocs(query(collection(db, 'users'), where('role', '==', 'funcionario')));
+    professionalsSnapshot.forEach(doc => {
+        const option = document.createElement('option');
+        option.value = doc.id;
+        option.textContent = `${doc.data().nome} (${doc.data().profession})`;
+        professionalSelect.appendChild(option);
+    });
+}
+
+async function carregarComandas(user, role) {
+    // Implementar lógica para comandas (próxima seção)
+}
+
+// ... (outras funções de carregamento mantidas)// src/main.js
 import { auth, db } from './firebase.js';
 import { registerUser, registerFirstAdmin, loginUser, logoutUser, onAuthStateChanged, getUserRole, getUserData, hasUsers } from './auth.js';
 import { collection, addDoc, getDocs, query, where, orderBy, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
@@ -28,38 +268,61 @@ document.addEventListener('DOMContentLoaded', () => {
             'acesso-negado.html': ['todos']
         };
 
+        const defaultPages = {
+            'admin': 'dashboard.html',
+            'funcionario': 'comandas.html',
+            'caixa': 'vendas.html'
+        };
+
         if (user) {
             const role = await getUserRole(user.uid);
             const userData = await getUserData(user.uid);
             console.log('Role:', role, 'Dados do usuário:', userData);
 
+            // Se não houver role (documento ausente), deslogar e redirecionar
+            if (!role) {
+                console.error('Usuário autenticado mas sem documento no Firestore:', user.uid);
+                alert('Seu perfil não está configurado. Entre em contato com o administrador.');
+                await logoutUser(); // Desloga o usuário
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // Se o role não estiver mapeado em defaultPages, negar acesso
+            if (!defaultPages[role]) {
+                console.error('Papel do usuário não mapeado:', role);
+                window.location.href = 'acesso-negado.html';
+                return;
+            }
+
             if (userInfo) {
-                if (userData && userData.nome) {
-                    userInfo.textContent = `${userData.nome} (${role})`;
-                } else {
-                    userInfo.textContent = `Usuário sem nome (${role})`;
-                    console.warn(`Dados do usuário não encontrados para UID: ${user.uid}`);
-                }
+                userInfo.textContent = userData && userData.nome ? `${userData.nome} (${role})` : `Usuário sem nome (${role})`;
             }
             if (logoutButton) logoutButton.classList.remove('d-none');
             if (loginButton) loginButton.classList.add('d-none');
 
+            // Exibir/esconder links na navbar conforme o papel
             document.getElementById('comandasLink')?.classList[role === 'admin' || role === 'funcionario' || role === 'caixa' ? 'remove' : 'add']('d-none');
             document.getElementById('produtosLink')?.classList[role === 'admin' ? 'remove' : 'add']('d-none');
             document.getElementById('vendasLink')?.classList[role === 'admin' || role === 'funcionario' || role === 'caixa' ? 'remove' : 'add']('d-none');
             document.getElementById('relatoriosLink')?.classList[role === 'admin' || role === 'caixa' ? 'remove' : 'add']('d-none');
             document.getElementById('cadastroUsuarioLink')?.classList[role === 'admin' ? 'remove' : 'add']('d-none');
 
-            if (!allowedPages[page]?.includes(role) && page !== 'index.html') {
-                console.log('Redirecionando para index.html: Permissão insuficiente');
-                window.location.href = 'index.html';
+            // Verificar permissões
+            if (!allowedPages[page]?.includes(role) && !allowedPages[page]?.includes('todos')) {
+                console.log('Acesso negado. Redirecionando para página padrão:', defaultPages[role]);
+                window.location.href = defaultPages[role];
                 return;
             }
 
+            // Redirecionar para a página padrão apenas se estiver em index.html ou register.html
             if (page === 'index.html' || page === 'register.html') {
-                console.log('Redirecionando para dashboard.html: Usuário logado');
-                window.location.href = 'dashboard.html';
+                console.log('Redirecionando para página padrão:', defaultPages[role]);
+                window.location.href = defaultPages[role];
+                return;
             }
+
+            // Carregar conteúdo da página atual
             if (page === 'dashboard.html') carregarDashboard(user, role);
             if (page === 'comandas.html') carregarComandas(user, role);
             if (page === 'produtos.html') carregarProdutos(user, role);
@@ -71,7 +334,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (logoutButton) logoutButton.classList.add('d-none');
             if (loginButton) loginButton.classList.remove('d-none');
 
-            if (page !== 'index.html' && page !== 'register.html') {
+            if (!allowedPages[page]?.includes('todos')) {
                 console.log('Redirecionando para index.html: Nenhum usuário logado');
                 window.location.href = 'index.html';
             }
@@ -94,11 +357,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (loginError) loginError.classList.add('d-none');
             } catch (error) {
                 console.error('Erro ao logar:', error);
-                if (loginError) {
-                    loginError.classList.remove('d-none');
-                } else {
-                    alert('Erro ao logar: ' + error.message);
-                }
+                if (loginError) loginError.classList.remove('d-none');
+                else alert('Erro ao logar: ' + error.message);
             }
         });
     }
@@ -117,13 +377,8 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 const user = await registerFirstAdmin(email, password, nome);
                 await updateDoc(doc(db, 'users', user.uid), {
-                    company: {
-                        nome: companyNome,
-                        cnpj: companyCNPJ,
-                        telefone: companyTelefone
-                    }
+                    company: { nome: companyNome, cnpj: companyCNPJ, telefone: companyTelefone }
                 });
-                console.log('Admin registrado com sucesso');
                 alert('Administrador registrado com sucesso!');
                 window.location.href = 'dashboard.html';
             } catch (error) {
@@ -133,19 +388,44 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    const cadastroForm = document.getElementById('cadastroForm');
-    if (cadastroForm) {
-        cadastroForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const nome = document.getElementById('cadastroNome').value;
-            const email = document.getElementById('cadastroEmail').value;
-            const password = document.getElementById('cadastroPassword').value;
-            const role = document.getElementById('cadastroTipo').value;
-            await registerUser(email, password, nome, role);
-            alert('Usuário cadastrado!');
+    // src/main.js (trecho do cadastroForm)
+const cadastroForm = document.getElementById('cadastroForm');
+if (cadastroForm) {
+    cadastroForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const nome = document.getElementById('cadastroNome').value;
+        const email = document.getElementById('cadastroEmail').value;
+        const password = document.getElementById('cadastroPassword').value;
+        const role = document.getElementById('cadastroTipo').value;
+        const profession = document.getElementById('cadastroProfissao').value;
+
+        console.log('Dados do formulário:', { nome, email, password, role, profession });
+
+        if (!nome || !email || !password || !role || !profession) {
+            console.error('Campos obrigatórios estão vazios');
+            alert('Por favor, preencha todos os campos.');
+            return;
+        }
+
+        try {
+            const user = await registerUser(email, password, nome, role, profession);
+            console.log('Usuário cadastrado com UID:', user.uid);
+            alert('Usuário cadastrado com sucesso!');
             cadastroForm.reset();
-        });
-    }
+        } catch (error) {
+            console.error('Erro ao cadastrar usuário:', error.code, error.message);
+            if (error.code === 'auth/email-already-in-use') {
+                alert('Este email já está em uso. Por favor, use um email diferente ou faça login.');
+            } else if (error.code === 'auth/weak-password') {
+                alert('A senha é muito fraca. Use pelo menos 6 caracteres.');
+            } else if (error.code === 'auth/invalid-email') {
+                alert('O email fornecido é inválido. Verifique o formato.');
+            } else {
+                alert('Erro ao cadastrar: ' + error.message);
+            }
+        }
+    });
+}
 
     const alterarSenhaForm = document.getElementById('alterarSenhaForm');
     if (alterarSenhaForm) {
@@ -160,67 +440,10 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Funções de carregamento (mantidas iguais)
-async function carregarDashboard(user, role) {
-    if (role === 'admin') {
-        const hoje = new Date().toISOString().split('T')[0];
-        const q = query(collection(db, 'comandas'), where('data', '==', hoje));
-        const snapshot = await getDocs(q);
-        document.getElementById('comandasDia').textContent = `Total: ${snapshot.size}`;
-        const faturamento = snapshot.docs.reduce((sum, doc) => sum + (doc.data().total || 0), 0);
-        document.getElementById('faturamentoDia').textContent = `R$${faturamento.toFixed(2)}`;
-    } else {
-        document.getElementById('comandasDia').textContent = 'Acesso restrito';
-        document.getElementById('faturamentoDia').textContent = 'Acesso restrito';
-    }
-}
-
-async function carregarComandas(user, role) {
-    const comandaForm = document.getElementById('comandaForm');
-    if (comandaForm && (role === 'admin' || role === 'funcionario')) {
-        comandaForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const cliente = document.getElementById('comandaCliente').value;
-            const data = document.getElementById('comandaData').value;
-            const servico = document.getElementById('comandaServico').value;
-            const profissional = document.getElementById('comandaProfissional').value;
-            await addDoc(collection(db, 'comandas'), { cliente, data, servicos: [{ servico, profissional, valor: 50 }], total: 50, status: 'aberta', criadoPor: user.uid });
-            carregarComandas(user, role);
-        });
-    }
-    const q = role === 'admin' ? query(collection(db, 'comandas')) : query(collection(db, 'comandas'), where('criadoPor', '==', user.uid));
-    const snapshot = await getDocs(q);
-    document.getElementById('tabelaComandas').innerHTML = snapshot.docs.map(doc => {
-        const data = doc.data();
-        return `<tr><td>${data.cliente}</td><td>${data.data}</td><td>${data.total}</td><td>${data.status}</td><td><button class="btn btn-sm btn-success fechar-comanda" data-id="${doc.id}">Fechar</button></td></tr>`;
-    }).join('');
-    document.querySelectorAll('.fechar-comanda').forEach(btn => {
-        btn.addEventListener('click', async () => {
-            await updateDoc(doc(db, 'comandas', btn.dataset.id), { status: 'fechada' });
-            carregarComandas(user, role);
-        });
-    });
-}
-
-async function carregarProdutos(user, role) {
-    if (role !== 'admin') window.location.href = 'index.html';
-}
-
-async function carregarVendas(user, role) {
-    if (!['admin', 'funcionario', 'caixa'].includes(role)) window.location.href = 'index.html';
-}
-
-async function carregarRelatorios(user, role) {
-    if (!['admin', 'caixa'].includes(role)) window.location.href = 'index.html';
-    const q = query(collection(db, 'vendas'));
-    const snapshot = await getDocs(q);
-    const total = snapshot.docs.reduce((sum, doc) => sum + doc.data().total, 0);
-    document.getElementById('faturamentoPeriodo').textContent = `Total: R$${total.toFixed(2)}`;
-}
-
-async function carregarPerfil(user, role) {
-    document.getElementById('userDetails').textContent = `Email: ${user.email} | Role: ${role}`;
-}
-
-async function carregarCadastroUsuario(user, role) {
-    if (role !== 'admin') window.location.href = 'index.html';
-}
+async function carregarDashboard(user, role) { /* ... */ }
+async function carregarComandas(user, role) { /* ... */ }
+async function carregarProdutos(user, role) { /* ... */ }
+async function carregarVendas(user, role) { /* ... */ }
+async function carregarRelatorios(user, role) { /* ... */ }
+async function carregarPerfil(user, role) { /* ... */ }
+async function carregarCadastroUsuario(user, role) { /* ... */ }
