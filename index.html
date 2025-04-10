@@ -28,10 +28,10 @@
                 <div class="col-md-6 mb-4 mb-md-0">
                     <h1 class="display-5 fw-bold">Gerencie Seu Negócio de Beleza com Facilidade</h1>
                     <p class="lead">O UserPluss é sua ferramenta completa para agendamentos, finanças e gestão de clientes. Tudo em um só lugar!</p>
-                    <a href="register-admin.html" class="btn btn-primary btn-lg">Comece Agora - É Grátis!</a>
+                    <a href="register-admin.html" id="registerLink" class="btn btn-primary btn-lg">Comece Agora - É Grátis!</a>
                 </div>
                 <div class="col-md-6 text-center">
-                    <img src="https://via.placeholder.com/500x500" alt="Profissional de beleza" class="img-fluid rounded shadow">
+                    <img src="./src/img/cabelonacintura.612x612.png" alt="Profissional de beleza" class="img-fluid rounded shadow">
                 </div>
             </div>
         </div>
@@ -80,8 +80,8 @@
                 </div>
                 <div class="modal-body">
                     <form id="loginForm">
-                        <input type="email" id="loginEmail" class="form-control mb-3" placeholder="Email" required>
-                        <input type="password" id="loginPassword" class="form-control mb-3" placeholder="Senha" required>
+                        <input type="email" id="loginEmail" class="form-control mb-3" placeholder="Email" required autocomplete="email">
+                        <input type="password" id="loginPassword" class="form-control mb-3" placeholder="Senha" required autocomplete="current-password">
                         <button type="submit" class="btn btn-primary w-100">Entrar</button>
                     </form>
                     <p id="loginError" class="text-danger mt-2 d-none">Email ou senha incorretos.</p>
@@ -117,9 +117,13 @@
 
         // Impede o redirecionamento automático ao clicar no link
         let isManualNavigation = false;
-        registerLink.addEventListener('click', (e) => {
-            isManualNavigation = true; // Marca como navegação manual
-        });
+        if (registerLink) {
+            registerLink.addEventListener('click', (e) => {
+                isManualNavigation = true; // Marca como navegação manual
+            });
+        } else {
+            console.error('Elemento com ID "registerLink" não encontrado.');
+        }
 
         onAuthStateChanged(auth, async (user) => {
             console.log('onAuthStateChanged chamado em index.html');

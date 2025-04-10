@@ -32,6 +32,7 @@
     <div class="content">
         <h1>Painel Administrativo</h1>
         <p>Resumo do seu salão: <span id="salonName"></span></p>
+        <p id="salonInfo"></p>
         <div class="row">
             <div class="col-md-4">
                 <div class="card text-center">
@@ -71,28 +72,53 @@
 
         onAuthStateChanged(auth, async (user) => {
             if (!user) {
-                window.location.href = 'login.html';
+                console.log('Nenhum usuário autenticado, redirecionando para index.html');
+                window.location.href = 'index.html';
                 return;
             }
 
-            const userDoc = await getDoc(doc(db, 'users', user.uid));
-            const userData = userDoc.data();
-            salonId = userData.salonId;
+            console.log('Usuário autenticado:', user.uid);
+            try {
+                const userDoc = await getDoc(doc(db, 'users', user.uid));
+                if (userDoc.exists()) {
+                    const userData = userDoc.data();
+                    console.log('Dados do usuário:', userData);
 
-            // Carrega o nome do salão
-            const salonDoc = await getDoc(doc(db, 'salons', salonId));
-            document.getElementById('salonName').textContent = salonDoc.data().name;
+                    // Carrega o nome do salão
+                    salonId = userData.salonId;
+                    const salonDoc = await getDoc(doc(db, 'salons', salonId));
+                    if (salonDoc.exists()) {
+                        document.getElementById('salonName').textContent = salonDoc.data().name;
+                        document.getElementById('salonInfo').textContent = `Nome: ${salonDoc.data().name}`;
+                    }
 
-            // Atualiza o menu com permissões
-            if (userData.permissions?.comandas) document.getElementById('comandasLink').classList.remove('d-none');
-            if (userData.permissions?.produtos) document.getElementById('produtosLink').classList.remove('d-none');
-            if (userData.permissions?.vendas) document.getElementById('vendasLink').classList.remove('d-none');
-            if (userData.permissions?.relatorios) document.getElementById('relatoriosLink').classList.remove('d-none');
-            if (userData.permissions?.cadastroUsuario) document.getElementById('cadastroUsuarioLink').classList.remove('d-none');
-            if (userData.permissions?.services) document.getElementById('servicesLink').classList.remove('d-none');
+                    // Atualiza o menu com permissões
+                    if (userData.permissions?.comandas) document.getElementById('comandasLink').classList.remove('d-none');
+                    if (userData.permissions?.produtos) document.getElementById('produtosLink').classList.remove('d-none');
+                    if (userData.permissions?.vendas) document.getElementById('vendasLink').classList.remove('d-none');
+                    if (userData.permissions?.relatorios) document.getElementById('relatoriosLink').classList.remove('d-none');
+                    if (userData.permissions?.cadastroUsuario) document.getElementById('cadastroUsuarioLink').classList.remove('d-none');
+                    if (userData.permissions?.services) document.getElementById('servicesLink').classList.remove('d-none');
 
-            // Carrega os contadores
-            loadDashboardData();
+                    // Carrega os contadores
+                    await loadDashboardData();
+
+                    // Se o usuário for administrador, lista todos os salões
+                    if (userData.isAdmin) {
+                        console.log('Usuário é administrador, listando todos os salões');
+                        const allSalons = await getDocs(collection(db, 'salons'));
+                        allSalons.forEach((doc) => {
+                            console.log('Salão:', doc.id, doc.data());
+                        });
+                    }
+                } else {
+                    console.log('Documento do usuário não existe, redirecionando para index.html');
+                    window.location.href = 'index.html';
+                }
+            } catch (error) {
+                console.error('Erro ao carregar dados:', error);
+                window.location.href = 'index.html';
+            }
         });
 
         async function loadDashboardData() {
@@ -110,43 +136,17 @@
             document.getElementById('usersCount').textContent = usersSnapshot.size;
         }
 
-        document.getElementById('logoutButton').addEventListener('click', () => {
-            auth.signOut().then(() => {
-                window.location.href = 'login.html';
-            });
+        document.getElementById('logoutButton').addEventListener('click', (e) => {
+            e.preventDefault(); // Evita o comportamento padrão do link
+            auth.signOut()
+                .then(() => {
+                    console.log('Logout bem-sucedido');
+                    window.location.href = 'index.html';
+                })
+                .catch((error) => {
+                    console.error('Erro ao fazer logout:', error);
+                });
         });
-        import { collection, getDocs } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
-
-onAuthStateChanged(auth, async (user) => {
-    if (!user) {
-        console.log('Nenhum usuário autenticado, redirecionando para index.html');
-        window.location.href = 'index.html';
-    } else {
-        console.log('Usuário autenticado:', user.uid);
-        try {
-            const userDoc = await getDoc(doc(db, 'users', user.uid));
-            if (userDoc.exists()) {
-                const userData = userDoc.data();
-                console.log('Dados do usuário:', userData);
-                if (userData.isAdmin) {
-                    console.log('Usuário é administrador, listando todos os salões');
-                    const allSalons = await getDocs(collection(db, 'salons'));
-                    allSalons.forEach((doc) => {
-                        console.log('Salão:', doc.id, doc.data());
-                    });
-                }
-                if (userData.salonId) {
-                    const salonDoc = await getDoc(doc(db, 'salons', userData.salonId));
-                    if (salonDoc.exists()) {
-                        document.getElementById('salonInfo').textContent = `Nome: ${salonDoc.data().name}`;
-                    }
-                }
-            }
-        } catch (error) {
-            console.error('Erro ao carregar dados:', error);
-        }
-    }
-});
     </script>
 </body>
 </html>

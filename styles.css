@@ -2,99 +2,101 @@
 body {
     margin: 0;
     font-family: 'Montserrat', sans-serif;
-    background: linear-gradient(135deg, #F8E1E9, #F5F5DC); /* Gradiente pastel */
+    background: #F5F5DC; /* Bege claro */
 }
 
-/* Seção Hero */
-.hero-section {
-    padding: 100px 0;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-}
-
-.hero-title {
-    font-family: 'Great Vibes', cursive;
-    font-size: 4rem;
+/* Menu Lateral */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 250px;
+    height: 100%;
+    background-color: #b4a7e2; /* Rosa vibrante */
+    padding-top: 20px;
     color: #FFFFFF;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-    margin-bottom: 20px;
 }
 
-.hero-subtitle {
-    font-size: 1.25rem;
-    color: #4A4A4A;
+.sidebar h3 {
+    font-family: 'Great Vibes', cursive;
+    font-size: 2rem;
     margin-bottom: 30px;
 }
 
-.btn-cta {
-    background-color: #FF6F91;
+.sidebar .nav-link {
     color: #FFFFFF;
-    padding: 12px 30px;
     font-size: 1.1rem;
-    border: none;
-    border-radius: 25px;
-    text-decoration: none;
+    padding: 10px 20px;
     transition: background-color 0.3s ease;
 }
 
-.btn-cta:hover {
-    background-color: #E65B7F;
+.sidebar .nav-link:hover,
+.sidebar .nav-link.active {
+    background-color: #cbc4e5;
+    border-radius: 5px;
 }
 
-.image-section img {
-    border-radius: 15px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+.sidebar .nav-link.text-danger {
+    color: #FFD1DC; /* Rosa claro para o botão Sair */
 }
 
-/* Seção de Benefícios */
-.benefits-section {
-    padding: 50px 0;
-    background-color: #FFFFFF;
+/* Conteúdo Principal */
+.content {
+    margin-left: 250px;
+    padding: 40px;
+    min-height: 100vh;
 }
 
-.benefit-card {
-    padding: 20px;
-    border: 1px solid #F5F5DC;
-    border-radius: 10px;
+.content h1 {
+    font-size: 2.5rem;
+    color: #4A4A4A;
     margin-bottom: 20px;
-    transition: transform 0.3s ease;
 }
 
-.benefit-card:hover {
-    transform: translateY(-5px);
+.content p {
+    font-size: 1.2rem;
+    color: #6C757D;
+    margin-bottom: 30px;
 }
 
-.benefit-icon {
-    margin-bottom: 15px;
+.content .card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
 }
 
-.benefit-card h3 {
+.content .card-title {
     font-size: 1.5rem;
     color: #4A4A4A;
-    margin-bottom: 10px;
 }
 
-.benefit-card p {
-    color: #6C757D;
+.content .card-text {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #a4d0f1;
 }
 
 /* Responsividade */
 @media (max-width: 768px) {
-    .hero-title {
-        font-size: 2.5rem;
+    .sidebar {
+        width: 200px;
     }
 
-    .hero-subtitle {
-        font-size: 1rem;
+    .content {
+        margin-left: 200px;
+        padding: 20px;
     }
 
-    .btn-cta {
-        padding: 10px 20px;
-        font-size: 1rem;
+    .content h1 {
+        font-size: 2rem;
     }
 
-    .image-section img {
-        margin-top: 30px;
+    .content .card-title {
+        font-size: 1.2rem;
+    }
+
+    .content .card-text {
+        font-size: 1.5rem;
     }
 }
