@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UserPluss</title>
+    <title>Gerenciador de Beleza</title>
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Fontes Personalizadas -->
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <!-- CSS Personalizado -->
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <nav class="navbar navbar-light bg-light">
@@ -39,7 +42,55 @@
             </div>
         </div>
     </div>
-
+ 
+        <!-- Seção Principal (Hero) -->
+        <section class="hero-section">
+            <div class="container">
+                <div class="row align-items-center">
+                    <!-- Texto à Esquerda -->
+                    <div class="col-md-6 text-section">
+                        <h1 class="hero-title">Bem-vindo(a) ao Seu Novo Gerenciador de Sucesso!</h1>
+                        <p class="hero-subtitle">Simplifique sua gestão e eleve os resultados do seu negócio de beleza com [Nome do Site]!</p>
+                        <a href="#" class="btn btn-cta">Comece Agora - É Grátis!</a>
+                    </div>
+                    <!-- Imagem à Direita -->
+                    <div class="col-md-6 image-section">
+                        <img src="https://via.placeholder.com/500x500" alt="Profissional de beleza em ambiente luxuoso" class="img-fluid">
+                    </div>
+                </div>
+            </div>
+        </section>
+    
+        <!-- Seção de Benefícios -->
+        <section class="benefits-section">
+            <div class="container">
+                <div class="row text-center">
+                    <div class="col-md-4">
+                        <div class="benefit-card">
+                            <img src="https://via.placeholder.com/50x50" alt="Ícone de Agendamento" class="benefit-icon">
+                            <h3>Agendamento Online</h3>
+                            <p>Facilite a marcação de horários para seus clientes.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="benefit-card">
+                            <img src="https://via.placeholder.com/50x50" alt="Ícone de Finanças" class="benefit-icon">
+                            <h3>Controle Financeiro</h3>
+                            <p>Gerencie suas finanças de forma simples e eficiente.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="benefit-card">
+                            <img src="https://via.placeholder.com/50x50" alt="Ícone de Clientes" class="benefit-icon">
+                            <h3>Gestão de Clientes</h3>
+                            <p>Mantenha um registro organizado dos seus clientes.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    
+        
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module" src="./src/js/firebase.js"></script>
     <script type="module">
