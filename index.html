@@ -12,15 +12,15 @@
             <a class="navbar-brand" href="index.html">UserPluss</a>
             <div id="navButtons">
                 <button id="loginButton" class="btn btn-primary me-2">Entrar</button>
+                <button id="logoutButton" class="btn btn-danger me-2" style="display: none;">Sair</button>
             </div>
         </div>
     </nav>
     <div class="container mt-5 text-center">
         <h1>Bem-vindo ao UserPluss</h1>
-        <p id="welcomeMessage">Faça login para acessar o sistema.</p>
+        <p id="welcomeMessage">Faça login para acessar o sistema ou <a href="register-admin.html" id="registerLink">cadastre-se como administrador</a>.</p>
     </div>
 
-    <!-- Modal de Login -->
     <div class="modal fade" id="loginModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -30,19 +30,108 @@
                 </div>
                 <div class="modal-body">
                     <form id="loginForm">
-                        <input type="email" id="loginEmail" class="form-control mb-3" placeholder="Email" required>
-                        <input type="password" id="loginPassword" class="form-control mb-3" placeholder="Senha" required>
+                        <input type="email" id="loginEmail" class="form-control mb-3" placeholder="Email" required autocomplete="email">
+                        <input type="password" id="loginPassword" class="form-control mb-3" placeholder="Senha" required autocomplete="current-password">
                         <button type="submit" class="btn btn-primary w-100">Entrar</button>
                     </form>
-                    <p id="loginError" class="text-danger mt-2 d-none">Email ou senha incorretos. Verifique os dados ou <a href="register.html">registre-se como administrador</a>.</p>
+                    <p id="loginError" class="text-danger mt-2 d-none">Email ou senha incorretos.</p>
                 </div>
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script type="module" src="../src/firebase.js"></script>
-    <script type="module" src="../src/auth.js"></script>
-    <script type="module" src="../src/main.js"></script>
+    <script type="module" src="./src/js/firebase.js"></script>
+    <script type="module">
+        import { auth, db } from './src/js/firebase.js';
+        import { onAuthStateChanged, signInWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
+        import { getDoc, doc, updateDoc } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
+
+        const loginButton = document.getElementById('loginButton');
+        const logoutButton = document.getElementById('logoutButton');
+        const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+        const registerLink = document.getElementById('registerLink');
+
+        loginButton.addEventListener('click', () => loginModal.show());
+
+        logoutButton.addEventListener('click', () => {
+            auth.signOut()
+                .then(() => {
+                    console.log('Logout bem-sucedido');
+                    window.location.reload();
+                })
+                .catch((error) => {
+                    console.error('Erro ao fazer logout:', error);
+                });
+        });
+
+        // Impede o redirecionamento automático ao clicar no link
+        let isManualNavigation = false;
+        registerLink.addEventListener('click', (e) => {
+            isManualNavigation = true; // Marca como navegação manual
+        });
+
+        onAuthStateChanged(auth, async (user) => {
+            console.log('onAuthStateChanged chamado em index.html');
+            if (user) {
+                console.log('Usuário autenticado:', user.uid);
+                try {
+                    const userDoc = await getDoc(doc(db, 'users', user.uid));
+                    if (userDoc.exists()) {
+                        const userData = userDoc.data();
+                        console.log('Dados do usuário:', userData);
+                        if (userData.salonId) {
+                            console.log('Usuário tem salonId, redirecionando para dashboard.html');
+                            if (!isManualNavigation) window.location.href = 'dashboard.html';
+                        } else {
+                            console.log('Usuário sem salonId, redirecionando para register-salon.html');
+                            if (!isManualNavigation) window.location.href = 'register-salon.html';
+                        }
+                    } else {
+                        console.log('Documento do usuário não existe, redirecionando para register-admin.html');
+                        if (!isManualNavigation) window.location.href = 'register-admin.html';
+                    }
+                } catch (error) {
+                    console.error('Erro ao verificar documento do usuário:', error);
+                    if (!isManualNavigation) window.location.href = 'register-admin.html';
+                }
+                logoutButton.style.display = 'inline-block';
+                loginButton.style.display = 'none';
+            } else {
+                console.log('Nenhum usuário autenticado, verificando config/firstAccess');
+                try {
+                    const configDoc = await getDoc(doc(db, 'config', 'firstAccess'));
+                    if (configDoc.exists() && !configDoc.data().initialized) {
+                        console.log('Sistema não inicializado, redirecionando para register-admin.html');
+                        if (!isManualNavigation) window.location.href = 'register-admin.html';
+                    } else {
+                        console.log('Sistema já inicializado, mantendo em index.html para login');
+                    }
+                } catch (error) {
+                    console.error('Erro ao verificar primeiro acesso:', error);
+                    console.log('Erro detectado, redirecionando para register-admin.html como fallback');
+                    if (!isManualNavigation) window.location.href = 'register-admin.html';
+                }
+                logoutButton.style.display = 'none';
+                loginButton.style.display = 'inline-block';
+            }
+        });
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                console.log('Login bem-sucedido, redirecionando para dashboard.html');
+                window.location.href = 'dashboard.html';
+            } catch (error) {
+                console.error('Erro ao logar:', error);
+                const errorMessage = document.getElementById('loginError');
+                errorMessage.classList.remove('d-none');
+            }
+        });
+    </script>
 </body>
 </html>

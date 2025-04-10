@@ -22,7 +22,7 @@
                     <li class="nav-item"><a href="relatorios.html" class="nav-link d-none" id="relatoriosLink">Relatórios</a></li>
                     <li class="nav-item"><a href="cadastro-usuario.html" class="nav-link d-none" id="cadastroUsuarioLink">Cadastro de Usuários</a></li>
                     <li class="nav-item"><a href="perfil.html" class="nav-link">Perfil</a></li>
-                    <li class="nav-item"><span id="userInfo" class="nav-link"></span></li>
+                    <li class="nav-item"><span id="userInfo.html" class="nav-link"></span></li>
                     <li class="nav-item"><button id="logoutButton" class="btn btn-outline-danger d-none">Sair</button></li>
                 </ul>
             </div>
@@ -54,9 +54,52 @@
         <p>Total: R$ <span id="comandaTotal">0.00</span></p>
         <button id="saveComanda" class="btn btn-success">Salvar Comanda</button>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script type="module" src="../src/firebase.js"></script>
-    <script type="module" src="../src/auth.js"></script>
-    <script type="module" src="../src/main.js"></script>
+    <!-- No final do arquivo -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script type="module" src="./src/js/firebase.js"></script>
+<script type="module" src="./src/js/auth.js"></script>
+<script type="module" src="./src/js/main.js"></script>
+<script type="module">
+    import { auth, db } from './src/js/firebase.js';
+    import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
+    import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
+
+    // Verificação de autenticação e permissões
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+            // Se não estiver autenticado, redireciona para login
+            window.location.href = 'login.html';
+            return;
+        }
+
+        // Busca as permissões do usuário no Firestore
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        const permissions = userDoc.data()?.permissions || {};
+
+        // Verifica permissão específica para "produtos"
+        if (!permissions.products) {
+            window.location.href = 'acesso-negado.html';
+            return;
+        }
+
+        // Exibe informações do usuário
+        document.getElementById('userInfo').textContent = user.email;
+        document.getElementById('logoutButton').classList.remove('d-none');
+
+        // Atualiza o menu com base nas permissões
+        if (permissions.comandas) document.getElementById('comandasLink').classList.remove('d-none');
+        if (permissions.produtos) document.getElementById('produtosLink').classList.remove('d-none');
+        if (permissions.vendas) document.getElementById('vendasLink').classList.remove('d-none');
+        if (permissions.relatorios) document.getElementById('relatoriosLink').classList.remove('d-none');
+        if (permissions.cadastroUsuario) document.getElementById('cadastroUsuarioLink').classList.remove('d-none');
+    });
+
+    // Logout
+    document.getElementById('logoutButton').addEventListener('click', () => {
+        auth.signOut().then(() => {
+            window.location.href = 'login.html';
+        });
+    });
+</script>
 </body>
 </html>
