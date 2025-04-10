@@ -10,30 +10,78 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <nav class="navbar navbar-light bg-light">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="index.html">UserPluss</a>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm py-3">
+        <div class="container">
+            <a class="navbar-brand fs-3 fw-bold" href="index.html" style="font-family: 'Great Vibes', cursive;">UserPluss</a>
             <div id="navButtons">
-                <button id="loginButton" class="btn btn-primary me-2">Entrar</button>
-                <button id="logoutButton" class="btn btn-danger me-2" style="display: none;">Sair</button>
+                <button id="loginButton" class="btn btn-outline-primary me-2">Entrar</button>
+                <button id="logoutButton" class="btn btn-outline-danger" style="display: none;">Sair</button>
             </div>
         </div>
     </nav>
-    <div class="container mt-5 text-center">
-        <h1>Bem-vindo ao UserPluss</h1>
-    </div>
 
+    <!-- Hero Section -->
+    <section class="hero-section text-white d-flex align-items-center">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6 mb-4 mb-md-0">
+                    <h1 class="display-5 fw-bold">Gerencie Seu Negócio de Beleza com Facilidade</h1>
+                    <p class="lead">O UserPluss é sua ferramenta completa para agendamentos, finanças e gestão de clientes. Tudo em um só lugar!</p>
+                    <a href="register-admin.html" class="btn btn-primary btn-lg">Comece Agora - É Grátis!</a>
+                </div>
+                <div class="col-md-6 text-center">
+                    <img src="https://via.placeholder.com/500x500" alt="Profissional de beleza" class="img-fluid rounded shadow">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benefícios -->
+    <section class="benefits-section py-5">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold">Por que escolher o UserPluss?</h2>
+                <p class="text-muted">Recursos que otimizam seu tempo e aumentam sua produtividade.</p>
+            </div>
+            <div class="row text-center">
+                <div class="col-md-4">
+                    <div class="benefit-card p-4 shadow-sm rounded">
+                        <img src="./src/img/agendamento.png" alt="Ícone de Agendamento" class="mb-3">
+                        <h5 class="fw-bold">Agendamento Online</h5>
+                        <p>Facilite a marcação de horários com um sistema rápido e intuitivo.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="benefit-card p-4 shadow-sm rounded">
+                        <img src="./src/img/financeiro25.png" alt="Ícone de Finanças" class="mb-3">
+                        <h5 class="fw-bold">Controle Financeiro</h5>
+                        <p>Organize suas receitas e despesas com clareza e praticidade.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="benefit-card p-4 shadow-sm rounded">
+                        <img src="./src/img/r2jpg.png" alt="Ícone de Clientes" class="mb-3">
+                        <h5 class="fw-bold">Gestão de Clientes</h5>
+                        <p>Mantenha um histórico completo e melhore o relacionamento com seus clientes.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Login Modal -->
     <div class="modal fade" id="loginModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Login</h5>
+                    <h5 class="modal-title">Entrar no Sistema</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <form id="loginForm">
-                        <input type="email" id="loginEmail" class="form-control mb-3" placeholder="Email" required autocomplete="email">
-                        <input type="password" id="loginPassword" class="form-control mb-3" placeholder="Senha" required autocomplete="current-password">
+                        <input type="email" id="loginEmail" class="form-control mb-3" placeholder="Email" required>
+                        <input type="password" id="loginPassword" class="form-control mb-3" placeholder="Senha" required>
                         <button type="submit" class="btn btn-primary w-100">Entrar</button>
                     </form>
                     <p id="loginError" class="text-danger mt-2 d-none">Email ou senha incorretos.</p>
@@ -41,56 +89,7 @@
             </div>
         </div>
     </div>
- 
-        <!-- Seção Principal (Hero) -->
-        <section class="hero-section">
-            <div class="container">
-                <div class="row align-items-center">
-                    <!-- Texto à Esquerda -->
-                    <div class="col-md-6 text-section">
-                        <h1 class="hero-title">Bem-vindo(a) ao Seu Novo Gerenciador de Sucesso!</h1>
-                        <p class="hero-subtitle">Simplifique sua gestão e eleve os resultados do seu negócio de beleza com [Nome do Site]!</p>
-                        <a href="register-admin.html">Comece Agora - É Grátis!</a>
-                    </div>
-                    <!-- Imagem à Direita -->
-                    <div class="col-md-6 image-section">
-                        <img src="https://via.placeholder.com/500x500" alt="Profissional de beleza em ambiente luxuoso" class="img-fluid">
-                        <p id="welcomeMessage">Faça login para acessar o sistema ou <a href="register-admin.html" id="registerLink">cadastre-se como administrador</a>.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-    
-        <!-- Seção de Benefícios -->
-        <section class="benefits-section">
-            <div class="container">
-                <div class="row text-center">
-                    <div class="col-md-4">
-                        <div class="benefit-card">
-                            <img src="https://via.placeholder.com/50x50" alt="Ícone de Agendamento" class="benefit-icon">
-                            <h3>Agendamento Online</h3>
-                            <p>Facilite a marcação de horários para seus clientes.</p>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="benefit-card">
-                            <img src="https://via.placeholder.com/50x50" alt="Ícone de Finanças" class="benefit-icon">
-                            <h3>Controle Financeiro</h3>
-                            <p>Gerencie suas finanças de forma simples e eficiente.</p>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="benefit-card">
-                            <img src="https://via.placeholder.com/50x50" alt="Ícone de Clientes" class="benefit-icon">
-                            <h3>Gestão de Clientes</h3>
-                            <p>Mantenha um registro organizado dos seus clientes.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-    
-        
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module" src="./src/js/firebase.js"></script>
     <script type="module">
