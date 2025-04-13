@@ -3,122 +3,166 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro de Usuários - UserPluss</title>
+    <title>Cadastro de Usuário - UserPluss</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="syles.css">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="index.html">UserPluss</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a href="dashboard.html" class="nav-link">Dashboard</a></li>
-                    <li class="nav-item"><a href="comandas.html" class="nav-link d-none" id="comandasLink">Comandas</a></li>
-                    <li class="nav-item"><a href="produtos.html" class="nav-link d-none" id="produtosLink">Produtos</a></li>
-                    <li class="nav-item"><a href="vendas.html" class="nav-link d-none" id="vendasLink">Vendas</a></li>
-                    <li class="nav-item"><a href="relatorios.html" class="nav-link d-none" id="relatoriosLink">Relatórios</a></li>
-                    <li class="nav-item"><a href="cadastro-usuario.html" class="nav-link d-none" id="cadastroUsuarioLink">Cadastro de Usuários</a></li>
-                    <li class="nav-item"><a href="services.html" class="nav-link d-none" id="servicesLink">Serviços</a></li>
-                    <li class="nav-item"><a href="perfil.html" class="nav-link">Perfil</a></li>
-                    <li class="nav-item"><span id="userInfo" class="nav-link"></span></li>
-                    <li class="nav-item"><button id="logoutButton" class="btn btn-outline-danger d-none">Sair</button></li>
-                </ul>
-            </div>
+    <!-- Menu Lateral -->
+    <div class="sidebar">
+        <h3 class="text-center">UserPluss Admin</h3>
+        <ul class="nav flex-column">
+            <li class="nav-item"><a class="nav-link" href="dashboard.html">Dashboard</a></li>
+            <li class="nav-item"><a class="nav-link d-none" href="comandas.html" id="comandasLink">Comandas</a></li>
+            <li class="nav-item"><a class="nav-link d-none" href="produtos.html" id="produtosLink">Produtos</a></li>
+            <li class="nav-item"><a class="nav-link d-none" href="vendas.html" id="vendasLink">Vendas</a></li>
+            <li class="nav-item"><a class="nav-link d-none" href="relatorios.html" id="relatoriosLink">Relatórios</a></li>
+            <li class="nav-item"><a class="nav-link active" href="cadastro-usuario.html" id="cadastroUsuarioLink">Cadastro de Usuários</a></li>
+            <li class="nav-item"><a class="nav-link d-none" href="services.html" id="servicesLink">Serviços</a></li>
+            <li class="nav-item"><a class="nav-link" href="perfil.html">Perfil</a></li>
+            <li class="nav-item"><a class="nav-link text-danger" href="#" id="logoutButton">Sair</a></li>
+        </ul>
+    </div>
+
+    <!-- Conteúdo Principal -->
+    <div class="content">
+        <h1>Cadastro de Novo Usuário</h1>
+        <div class="card p-4">
+            <form id="cadastroUsuarioForm">
+                <div class="mb-3">
+                    <label for="nome" class="form-label">Nome</label>
+                    <input type="text" id="nome" class="form-control" placeholder="Nome completo" required>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">E-mail</label>
+                    <input type="email" id="email" class="form-control" placeholder="email@exemplo.com" required autocomplete="email">
+                </div>
+                <div class="mb-3">
+                    <label for="telefone" class="form-label">Telefone</label>
+                    <input type="tel" id="telefone" class="form-control" placeholder="(XX) XXXXX-XXXX" required>
+                </div>
+                <div class="mb-3">
+                    <label for="senha" class="form-label">Senha Temporária</label>
+                    <input type="password" id="senha" class="form-control" placeholder="Crie uma senha temporária" required autocomplete="new-password">
+                </div>
+                <div class="mb-3">
+                    <label for="aniversario" class="form-label">Data de Nascimento</label>
+                    <input type="date" id="aniversario" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Cadastrar Usuário</button>
+            </form>
+            <p id="mensagemSucesso" class="text-success mt-2 d-none"></p>
+            <p id="mensagemErro" class="text-danger mt-2 d-none"></p>
         </div>
-    </nav>
-    <div class="container mt-5">
-        <h1>Cadastrar Usuário</h1>
-        <form id="userForm" class="card p-3 mb-3">
-            <input type="email" id="userEmail" class="form-control mb-2" placeholder="Email" required>
-            <input type="password" id="userPassword" class="form-control mb-2" placeholder="Senha" required>
-            <div class="form-check mb-2">
-                <input type="checkbox" id="permProducts" class="form-check-input">
-                <label class="form-check-label" for="permProducts">Produtos</label>
-            </div>
-            <div class="form-check mb-2">
-                <input type="checkbox" id="permServices" class="form-check-input">
-                <label class="form-check-label" for="permServices">Serviços</label>
-            </div>
-            <div class="form-check mb-2">
-                <input type="checkbox" id="permVendas" class="form-check-input">
-                <label class="form-check-label" for="permVendas">Vendas</label>
-            </div>
-            <button type="submit" class="btn btn-primary">Cadastrar</button>
-        </form>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module" src="./src/js/firebase.js"></script>
     <script type="module">
         import { auth, db } from './src/js/firebase.js';
-        import { onAuthStateChanged, createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
-        import { doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
+        import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
+        import { createUserWithEmailAndPassword, sendPasswordResetEmail, fetchSignInMethodsForEmail } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
+        import { doc, setDoc, collection } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
 
-        let salonId;
-
+        // Verificar se o usuário atual é super administrador
         onAuthStateChanged(auth, async (user) => {
             if (!user) {
-                window.location.href = 'login.html';
+                window.location.href = 'index.html';
                 return;
             }
 
             const userDoc = await getDoc(doc(db, 'users', user.uid));
-            const userData = userDoc.data();
-            salonId = userData.salonId;
-
-            if (!userData.permissions?.cadastroUsuario) {
-                window.location.href = 'acesso-negado.html';
+            if (!userDoc.exists() || !userDoc.data().isSuperAdmin) {
+                alert('Acesso não autorizado. Apenas o super administrador pode cadastrar usuários.');
+                window.location.href = 'dashboard.html';
                 return;
             }
 
-            document.getElementById('userInfo').textContent = user.email;
-            document.getElementById('logoutButton').classList.remove('d-none');
-
-            if (userData.permissions.comandas) document.getElementById('comandasLink').classList.remove('d-none');
-            if (userData.permissions.produtos) document.getElementById('produtosLink').classList.remove('d-none');
-            if (userData.permissions.vendas) document.getElementById('vendasLink').classList.remove('d-none');
-            if (userData.permissions.relatorios) document.getElementById('relatoriosLink').classList.remove('d-none');
-            if (userData.permissions.cadastroUsuario) document.getElementById('cadastroUsuarioLink').classList.remove('d-none');
-            if (userData.permissions.services) document.getElementById('servicesLink').classList.remove('d-none');
+            // Exibir links do menu para o super administrador
+            document.getElementById('comandasLink').classList.remove('d-none');
+            document.getElementById('produtosLink').classList.remove('d-none');
+            document.getElementById('vendasLink').classList.remove('d-none');
+            document.getElementById('relatoriosLink').classList.remove('d-none');
+            document.getElementById('cadastroUsuarioLink').classList.remove('d-none');
+            document.getElementById('servicesLink').classList.remove('d-none');
         });
 
-        document.getElementById('userForm').addEventListener('submit', async (e) => {
+        // Lógica de cadastro de novo usuário
+        document.getElementById('cadastroUsuarioForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = document.getElementById('userEmail').value;
-            const password = document.getElementById('userPassword').value;
-            const permissions = {
-                products: document.getElementById('permProducts').checked,
-                services: document.getElementById('permServices').checked,
-                vendas: document.getElementById('permVendas').checked
-            };
+
+            const nome = document.getElementById('nome').value;
+            const email = document.getElementById('email').value;
+            const telefone = document.getElementById('telefone').value;
+            const senha = document.getElementById('senha').value;
+            const aniversario = document.getElementById('aniversario').value;
+            const mensagemSucesso = document.getElementById('mensagemSucesso');
+            const mensagemErro = document.getElementById('mensagemErro');
 
             try {
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                // Verificar se o e-mail já está em uso
+                const signInMethods = await fetchSignInMethodsForEmail(auth, email);
+                if (signInMethods.length > 0) {
+                    mensagemErro.textContent = 'Este e-mail já está em uso. Use outro e-mail.';
+                    mensagemErro.classList.remove('d-none');
+                    mensagemSucesso.classList.add('d-none');
+                    return;
+                }
+
+                // Criar o usuário no Firebase Auth
+                const userCredential = await createUserWithEmailAndPassword(auth, email, senha);
                 const user = userCredential.user;
 
-                console.log('Criando usuário com salonId:', salonId); // Debug
-
-                await setDoc(doc(db, 'users', user.uid), {
-                    email: user.email,
-                    salonId: salonId,
-                    permissions: permissions,
-                    isAdmin: false
+                // Enviar e-mail para redefinir a senha (o usuário precisará criar sua própria senha)
+                await sendPasswordResetEmail(user, {
+                    url: `${window.location.origin}/login.html`,
                 });
 
-                document.getElementById('userForm').reset();
-                alert('Usuário cadastrado com sucesso!');
+                // Criar documento do usuário no Firestore
+                await setDoc(doc(db, 'users', user.uid), {
+                    nome,
+                    email,
+                    telefone,
+                    aniversario,
+                    isAdmin: true, // Administrador do salão
+                    isSuperAdmin: false, // Não é super administrador
+                    createdAt: new Date().toISOString(),
+                });
+
+                // Criar coleções iniciais no Firestore para o salão do usuário
+                const salonId = user.uid; // Usar o UID do usuário como ID do salão
+                await setDoc(doc(db, 'salons', salonId), { adminId: user.uid, createdAt: new Date().toISOString() });
+                await setDoc(doc(collection(db, 'salons', salonId, 'estabelecimento')), {});
+                await setDoc(doc(collection(db, 'salons', salonId, 'funcionarios')), {});
+                await setDoc(doc(collection(db, 'salons', salonId, 'servicos')), {});
+                await setDoc(doc(collection(db, 'salons', salonId, 'estoque')), {});
+                await setDoc(doc(collection(db, 'salons', salonId, 'caixa')), {});
+                await setDoc(doc(collection(db, 'salons', salonId, 'agendamento')), {});
+
+                mensagemSucesso.textContent = 'Usuário cadastrado com sucesso! Um e-mail foi enviado para que ele redefina sua senha.';
+                mensagemSucesso.classList.remove('d-none');
+                mensagemErro.classList.add('d-none');
+                document.getElementById('cadastroUsuarioForm').reset();
             } catch (error) {
-                console.error('Erro ao cadastrar usuário:', error);
-                alert('Erro ao cadastrar: ' + error.message);
+                console.error('Erro ao cadastrar:', error);
+                mensagemErro.classList.remove('d-none');
+                mensagemSucesso.classList.add('d-none');
+                if (error.code === 'auth/email-already-in-use') {
+                    mensagemErro.textContent = 'Este e-mail já está em uso. Use outro e-mail.';
+                } else if (error.code === 'auth/unauthorized-continue-uri') {
+                    mensagemErro.textContent = 'Erro: O domínio atual não está autorizado. Por favor, contate o administrador do sistema.';
+                } else {
+                    mensagemErro.textContent = 'Erro ao cadastrar: ' + error.message;
+                }
             }
         });
 
-        document.getElementById('logoutButton').addEventListener('click', () => {
+        // Botão de logout
+        document.getElementById('logoutButton').addEventListener('click', (e) => {
+            e.preventDefault();
             auth.signOut().then(() => {
-                window.location.href = 'login.html';
+                window.location.href = 'index.html';
             });
         });
     </script>

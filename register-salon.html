@@ -5,61 +5,120 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro de Salão - UserPluss</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container mt-5">
-        <h1>Cadastro de Salão (2/3)</h1>
-        <p>Crie um salão para gerenciar seus serviços.</p>
-        <form id="salonForm" class="card p-3">
-            <input type="text" id="salonName" class="form-control mb-2" placeholder="Nome do Salão" required>
-            <button type="submit" class="btn btn-primary">Próximo</button>
-        </form>
-        <p id="salonError" class="text-danger mt-2 d-none">Erro ao cadastrar salão. Tente novamente.</p>
+        <h1 class="display-5 fw-bold">Cadastro de Salão</h1>
+        <p class="lead">Preencha os dados do seu salão para continuar.</p>
+        <div class="card p-4">
+            <form id="cadastroSalaoForm">
+                <div class="mb-3">
+                    <label for="nomeSalao" class="form-label">Nome do Salão</label>
+                    <input type="text" id="nomeSalao" class="form-control" placeholder="Nome do salão" required>
+                </div>
+                <div class="mb-3">
+                    <label for="emailSalao" class="form-label">E-mail do Salão</label>
+                    <input type="email" id="emailSalao" class="form-control" placeholder="email@salao.com" required autocomplete="email">
+                </div>
+                <div class="mb-3">
+                    <label for="senhaSalao" class="form-label">Senha do Salão</label>
+                    <input type="password" id="senhaSalao" class="form-control" placeholder="Crie uma senha" required autocomplete="new-password">
+                </div>
+                <div class="mb-3">
+                    <label for="rua" class="form-label">Rua</label>
+                    <input type="text" id="rua" class="form-control" placeholder="Rua" required>
+                </div>
+                <div class="mb-3">
+                    <label for="bairro" class="form-label">Bairro</label>
+                    <input type="text" id="bairro" class="form-control" placeholder="Bairro" required>
+                </div>
+                <div class="mb-3">
+                    <label for="cidade" class="form-label">Cidade</label>
+                    <input type="text" id="cidade" class="form-control" placeholder="Cidade" required>
+                </div>
+                <div class="mb-3">
+                    <label for="estado" class="form-label">Estado</label>
+                    <input type="text" id="estado" class="form-control" placeholder="Estado" required>
+                </div>
+                <div class="mb-3">
+                    <label for="telefone1" class="form-label">Telefone Comercial 1</label>
+                    <input type="tel" id="telefone1" class="form-control" placeholder="(XX) XXXXX-XXXX">
+                </div>
+                <div class="mb-3">
+                    <label for="telefone2" class="form-label">Telefone Comercial 2 (opcional)</label>
+                    <input type="tel" id="telefone2" class="form-control" placeholder="(XX) XXXXX-XXXX">
+                </div>
+                <div class="mb-3">
+                    <label for="telefone3" class="form-label">Telefone Comercial 3 (opcional)</label>
+                    <input type="tel" id="telefone3" class="form-control" placeholder="(XX) XXXXX-XXXX">
+                </div>
+                <button type="submit" class="btn btn-primary">Cadastrar Salão</button>
+            </form>
+            <p id="mensagemErro" class="text-danger mt-2 d-none"></p>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module" src="./src/js/firebase.js"></script>
     <script type="module">
-        import { auth, db } from './src/js/firebase.js';
-        import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
-        import { doc, setDoc, updateDoc, collection } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
+        import { db } from './src/js/firebase.js';
+        import { doc, updateDoc, setDoc, collection } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
 
-        onAuthStateChanged(auth, (user) => {
-            if (!user) {
-                console.log('Nenhum usuário autenticado, redirecionando para index.html');
-                window.location.href = 'index.html';
-            } else {
-                console.log('Usuário autenticado em register-salon.html:', user.uid);
-            }
-        });
-
-        document.getElementById('salonForm').addEventListener('submit', async (e) => {
+        document.getElementById('cadastroSalaoForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            const salonName = document.getElementById('salonName').value;
-            const user = auth.currentUser;
+            const nomeSalao = document.getElementById('nomeSalao').value;
+            const emailSalao = document.getElementById('emailSalao').value;
+            const senhaSalao = document.getElementById('senhaSalao').value;
+            const rua = document.getElementById('rua').value;
+            const bairro = document.getElementById('bairro').value;
+            const cidade = document.getElementById('cidade').value;
+            const estado = document.getElementById('estado').value;
+            const telefone1 = document.getElementById('telefone1').value;
+            const telefone2 = document.getElementById('telefone2').value;
+            const telefone3 = document.getElementById('telefone3').value;
+            const mensagemErro = document.getElementById('mensagemErro');
 
-            if (user) {
-                try {
-                    const salonId = doc(collection(db, 'salons')).id; // Gera um ID único
-                    await setDoc(doc(db, 'salons', salonId), {
-                        name: salonName,
-                        adminId: user.uid,
-                        createdAt: new Date().toISOString()
-                    });
+            // Validar pelo menos um telefone
+            if (!telefone1 && !telefone2 && !telefone3) {
+                mensagemErro.textContent = 'Pelo menos um telefone comercial é obrigatório.';
+                mensagemErro.classList.remove('d-none');
+                return;
+            }
 
-                    await updateDoc(doc(db, 'users', user.uid), {
-                        salonId: salonId
-                    });
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const uid = urlParams.get('uid');
+                const salonId = uid; // Usar o UID do usuário como ID do salão
 
-                    console.log('Salão cadastrado com sucesso!');
-                    window.location.href = 'dashboard.html';
-                } catch (error) {
-                    console.error('Erro ao cadastrar salão:', error);
-                    const errorMessage = document.getElementById('salonError');
-                    errorMessage.textContent = 'Erro ao cadastrar salão: ' + error.message;
-                    errorMessage.classList.remove('d-none');
-                }
+                // Atualizar o documento do salão no Firestore
+                await updateDoc(doc(db, 'salons', salonId), {
+                    name: nomeSalao,
+                    email: emailSalao,
+                    senha: btoa(senhaSalao), // Criptografar a senha em Base64
+                    endereco: { rua, bairro, cidade, estado },
+                    telefones: [telefone1, telefone2, telefone3].filter(tel => tel),
+                    updatedAt: new Date().toISOString(),
+                });
+
+                // Atualizar o documento do usuário com o salonId
+                await updateDoc(doc(db, 'users', uid), {
+                    salonId: salonId,
+                });
+
+                // Criar ou atualizar outras coleções, se necessário
+                await setDoc(doc(collection(db, 'salons', salonId, 'configuracoes')), {
+                    preferencias: { tema: 'claro', notificacoes: true },
+                });
+
+                alert('Salão cadastrado com sucesso! Bem-vindo ao UserPluss.');
+                window.location.href = 'boas-vindas.html';
+            } catch (error) {
+                console.error('Erro ao cadastrar salão:', error);
+                mensagemErro.textContent = 'Erro ao cadastrar salão: ' + error.message;
+                mensagemErro.classList.remove('d-none');
             }
         });
     </script>

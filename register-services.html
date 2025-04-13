@@ -25,60 +25,73 @@
     <script type="module">
         import { auth, db } from './src/js/firebase.js';
         import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
-        import { doc, getDoc, collection, addDoc } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
-
-        let salonId;
+        import { doc, getDoc, collection, getDocs, collectionGroup } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
 
         onAuthStateChanged(auth, async (user) => {
             if (!user) {
                 window.location.href = 'index.html';
                 return;
             }
+
             const userDoc = await getDoc(doc(db, 'users', user.uid));
-            salonId = userDoc.data().salonId;
-            if (!salonId) {
-                window.location.href = 'register-salon.html';
+            if (!userDoc.exists()) {
+                window.location.href = 'index.html';
+                return;
             }
-        });
 
-        document.getElementById('servicesForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
+            const userData = userDoc.data();
+            if (userData.isSuperAdmin) {
+                // Super administrador pode ver todos os serviços de todos os salões
+                document.getElementById('superAdminContent').classList.remove('d-none');
+                document.getElementById('salonAdminContent').classList.add('d-none');
 
-            const name = document.getElementById('serviceName').value;
-            const price = parseFloat(document.getElementById('servicePrice').value);
-
-            try {
-                await addDoc(collection(db, 'salons', salonId, 'services'), {
-                    name,
-                    price,
-                    createdAt: new Date().toISOString()
+                const allServices = await getDocs(collectionGroup(db, 'servicos'));
+                const allServicesList = document.getElementById('allServicesList');
+                allServices.forEach((doc) => {
+                    const service = doc.data();
+                    const li = document.createElement('li');
+                    li.classList.add('list-group-item');
+                    li.textContent = `Serviço: ${service.nome} - Preço: R$${service.preco}`;
+                    allServicesList.appendChild(li);
                 });
 
-                document.getElementById('servicesForm').reset();
-                loadServices();
-            } catch (error) {
-                console.error('Erro ao cadastrar serviço:', error);
-                const errorMessage = document.getElementById('servicesError');
-                errorMessage.textContent = 'Erro ao cadastrar: ' + error.message;
-                errorMessage.classList.remove('d-none');
+                // Exibir todos os links do menu para o super administrador
+                document.getElementById('comandasLink').classList.remove('d-none');
+                document.getElementById('produtosLink').classList.remove('d-none');
+                document.getElementById('vendasLink').classList.remove('d-none');
+                document.getElementById('relatoriosLink').classList.remove('d-none');
+                document.getElementById('cadastroUsuarioLink').classList.remove('d-none');
+                document.getElementById('servicesLink').classList.remove('d-none');
+            } else {
+                // Administrador de salão só pode ver os serviços do seu salão
+                const salonId = user.uid;
+                document.getElementById('superAdminContent').classList.add('d-none');
+                document.getElementById('salonAdminContent').classList.remove('d-none');
+
+                const servicesSnapshot = await getDocs(collection(db, 'salons', salonId, 'servicos'));
+                const servicesList = document.getElementById('servicesList');
+                servicesSnapshot.forEach((doc) => {
+                    const service = doc.data();
+                    const li = document.createElement('li');
+                    li.classList.add('list-group-item');
+                    li.textContent = `Serviço: ${service.nome} - Preço: R$${service.preco}`;
+                    servicesList.appendChild(li);
+                });
+
+                // Atualiza o menu com permissões limitadas (não exibe "Cadastro de Usuários")
+                if (userData.permissions?.comandas) document.getElementById('comandasLink').classList.remove('d-none');
+                if (userData.permissions?.produtos) document.getElementById('produtosLink').classList.remove('d-none');
+                if (userData.permissions?.vendas) document.getElementById('vendasLink').classList.remove('d-none');
+                if (userData.permissions?.relatorios) document.getElementById('relatoriosLink').classList.remove('d-none');
+                if (userData.permissions?.services) document.getElementById('servicesLink').classList.remove('d-none');
             }
         });
 
-        async function loadServices() {
-            const servicesSnapshot = await getDocs(collection(db, 'salons', salonId, 'services'));
-            const listaServicos = document.getElementById('listaServicos');
-            listaServicos.innerHTML = '';
-            servicesSnapshot.forEach((doc) => {
-                const service = doc.data();
-                const li = document.createElement('li');
-                li.className = 'list-group-item';
-                li.textContent = `${service.name} - R$${service.price}`;
-                listaServicos.appendChild(li);
+        document.getElementById('logoutButton').addEventListener('click', (e) => {
+            e.preventDefault();
+            auth.signOut().then(() => {
+                window.location.href = 'index.html';
             });
-        }
-
-        document.getElementById('finishButton').addEventListener('click', () => {
-            window.location.href = 'dashboard.html';
         });
     </script>
 </body>

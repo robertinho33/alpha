@@ -4,11 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - UserPluss</title>
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Fontes Personalizadas -->
     <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
-    <!-- CSS Personalizado -->
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -31,30 +28,36 @@
     <!-- Conteúdo Principal -->
     <div class="content">
         <h1>Painel Administrativo</h1>
-        <p>Resumo do seu salão: <span id="salonName"></span></p>
-        <p id="salonInfo"></p>
-        <div class="row">
-            <div class="col-md-4">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <h5 class="card-title">Produtos</h5>
-                        <p class="card-text" id="productsCount">0</p>
+        <div id="superAdminContent" class="d-none">
+            <h2>Todos os Salões</h2>
+            <ul id="salonsList" class="list-group"></ul>
+        </div>
+        <div id="salonAdminContent">
+            <p>Resumo do seu salão: <span id="salonName"></span></p>
+            <p id="salonInfo"></p>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h5 class="card-title">Produtos</h5>
+                            <p class="card-text" id="productsCount">0</p>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <h5 class="card-title">Serviços</h5>
-                        <p class="card-text" id="servicesCount">0</p>
+                <div class="col-md-4">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h5 class="card-title">Serviços</h5>
+                            <p class="card-text" id="servicesCount">0</p>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <h5 class="card-title">Usuários</h5>
-                        <p class="card-text" id="usersCount">0</p>
+                <div class="col-md-4">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h5 class="card-title">Usuários</h5>
+                            <p class="card-text" id="usersCount">0</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -84,32 +87,47 @@
                     const userData = userDoc.data();
                     console.log('Dados do usuário:', userData);
 
-                    // Carrega o nome do salão
-                    salonId = userData.salonId;
-                    const salonDoc = await getDoc(doc(db, 'salons', salonId));
-                    if (salonDoc.exists()) {
-                        document.getElementById('salonName').textContent = salonDoc.data().name;
-                        document.getElementById('salonInfo').textContent = `Nome: ${salonDoc.data().name}`;
-                    }
+                    // Verificar se o usuário é super administrador
+                    if (userData.isSuperAdmin) {
+                        document.getElementById('superAdminContent').classList.remove('d-none');
+                        document.getElementById('salonAdminContent').classList.add('d-none');
 
-                    // Atualiza o menu com permissões
-                    if (userData.permissions?.comandas) document.getElementById('comandasLink').classList.remove('d-none');
-                    if (userData.permissions?.produtos) document.getElementById('produtosLink').classList.remove('d-none');
-                    if (userData.permissions?.vendas) document.getElementById('vendasLink').classList.remove('d-none');
-                    if (userData.permissions?.relatorios) document.getElementById('relatoriosLink').classList.remove('d-none');
-                    if (userData.permissions?.cadastroUsuario) document.getElementById('cadastroUsuarioLink').classList.remove('d-none');
-                    if (userData.permissions?.services) document.getElementById('servicesLink').classList.remove('d-none');
-
-                    // Carrega os contadores
-                    await loadDashboardData();
-
-                    // Se o usuário for administrador, lista todos os salões
-                    if (userData.isAdmin) {
-                        console.log('Usuário é administrador, listando todos os salões');
+                        // Listar todos os salões
                         const allSalons = await getDocs(collection(db, 'salons'));
+                        const salonsList = document.getElementById('salonsList');
                         allSalons.forEach((doc) => {
-                            console.log('Salão:', doc.id, doc.data());
+                            const salon = doc.data();
+                            const li = document.createElement('li');
+                            li.classList.add('list-group-item');
+                            li.textContent = `Salão: ${salon.name || 'Sem nome'} (ID: ${doc.id})`;
+                            salonsList.appendChild(li);
                         });
+
+                        // Exibir todos os links do menu para o super administrador
+                        document.getElementById('comandasLink').classList.remove('d-none');
+                        document.getElementById('produtosLink').classList.remove('d-none');
+                        document.getElementById('vendasLink').classList.remove('d-none');
+                        document.getElementById('relatoriosLink').classList.remove('d-none');
+                        document.getElementById('cadastroUsuarioLink').classList.remove('d-none');
+                        document.getElementById('servicesLink').classList.remove('d-none');
+                    } else {
+                        // Usuário é administrador de um salão
+                        salonId = user.uid; // O salonId é o mesmo que o UID do usuário
+                        const salonDoc = await getDoc(doc(db, 'salons', salonId));
+                        if (salonDoc.exists()) {
+                            document.getElementById('salonName').textContent = salonDoc.data().name;
+                            document.getElementById('salonInfo').textContent = `Nome: ${salonDoc.data().name}`;
+                        }
+
+                        // Atualiza o menu com permissões limitadas (não exibe "Cadastro de Usuários")
+                        if (userData.permissions?.comandas) document.getElementById('comandasLink').classList.remove('d-none');
+                        if (userData.permissions?.produtos) document.getElementById('produtosLink').classList.remove('d-none');
+                        if (userData.permissions?.vendas) document.getElementById('vendasLink').classList.remove('d-none');
+                        if (userData.permissions?.relatorios) document.getElementById('relatoriosLink').classList.remove('d-none');
+                        if (userData.permissions?.services) document.getElementById('servicesLink').classList.remove('d-none');
+
+                        // Carrega os contadores do salão
+                        await loadDashboardData();
                     }
                 } else {
                     console.log('Documento do usuário não existe, redirecionando para index.html');
@@ -127,7 +145,7 @@
             document.getElementById('productsCount').textContent = productsSnapshot.size;
 
             // Contagem de serviços
-            const servicesSnapshot = await getDocs(collection(db, 'salons', salonId, 'services'));
+            const servicesSnapshot = await getDocs(collection(db, 'salons', salonId, 'servicos'));
             document.getElementById('servicesCount').textContent = servicesSnapshot.size;
 
             // Contagem de usuários do salão
@@ -137,7 +155,7 @@
         }
 
         document.getElementById('logoutButton').addEventListener('click', (e) => {
-            e.preventDefault(); // Evita o comportamento padrão do link
+            e.preventDefault();
             auth.signOut()
                 .then(() => {
                     console.log('Logout bem-sucedido');

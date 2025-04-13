@@ -3,58 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro de Administrador - UserPluss</title>
+    <title>Cadastro de Usuário MASTER - UserPluss</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container mt-5">
-        <h1>Cadastro de Administrador (1/3)</h1>
-        <p>Crie uma conta de administrador para começar.</p>
-        <form id="adminForm" class="card p-3">
-            <input type="text" id="adminName" class="form-control mb-2" placeholder="Nome" required>
-            <input type="email" id="adminEmail" class="form-control mb-2" placeholder="Email" required>
-            <input type="password" id="adminPassword" class="form-control mb-2" placeholder="Senha" required autocomplete="new-password">
-            <button type="submit" class="btn btn-primary">Próximo</button>
-        </form>
-        <p id="adminError" class="text-danger mt-2 d-none">Erro ao cadastrar. Tente novamente.</p>
+        <h1 class="display-5 fw-bold">Cadastro de Usuário MASTER</h1>
+        <p class="lead">Preencha os dados abaixo para criar sua conta de administrador.</p>
+        <div class="card p-4">
+            <form id="cadastroMasterForm">
+                <div class="mb-3">
+                    <label for="nome" class="form-label">Nome</label>
+                    <input type="text" id="nome" class="form-control" placeholder="Seu nome completo" required>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">E-mail</label>
+                    <input type="email" id="email" class="form-control" placeholder="seuemail@exemplo.com" required autocomplete="email">
+                </div>
+                <div class="mb-3">
+                    <label for="telefone" class="form-label">Telefone</label>
+                    <input type="tel" id="telefone" class="form-control" placeholder="(XX) XXXXX-XXXX" required>
+                </div>
+                <div class="mb-3">
+                    <label for="senha" class="form-label">Senha</label>
+                    <input type="password" id="senha" class="form-control" placeholder="Crie uma senha" required autocomplete="new-password">
+                </div>
+                <div class="mb-3">
+                    <label for="aniversario" class="form-label">Data de Nascimento</label>
+                    <input type="date" id="aniversario" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Cadastrar</button>
+            </form>
+            <p id="mensagemErro" class="text-danger mt-2 d-none"></p>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module" src="./src/js/firebase.js"></script>
     <script type="module">
         import { auth, db } from './src/js/firebase.js';
-        import { createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
-        import { doc, setDoc } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
+        import { createUserWithEmailAndPassword, sendEmailVerification } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
+        import { doc, setDoc, collection } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
 
-        document.getElementById('adminForm').addEventListener('submit', async (e) => {
+        document.getElementById('cadastroMasterForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            const name = document.getElementById('adminName').value;
-            const email = document.getElementById('adminEmail').value;
-            const password = document.getElementById('adminPassword').value;
+            const nome = document.getElementById('nome').value;
+            const email = document.getElementById('email').value;
+            const telefone = document.getElementById('telefone').value;
+            const senha = document.getElementById('senha').value;
+            const aniversario = document.getElementById('aniversario').value;
+            const mensagemErro = document.getElementById('mensagemErro');
 
             try {
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                // Criptografar a senha em Base64
+                const senhaHash = btoa(senha);
+
+                // Criar o usuário no Firebase Auth
+                const userCredential = await createUserWithEmailAndPassword(auth, email, senha);
                 const user = userCredential.user;
 
-                await setDoc(doc(db, 'users', user.uid), {
-                    name: name,
-                    email: user.email,
-                    isAdmin: true, // Confirme que isso está aqui
-                    createdAt: new Date().toISOString()
+                // Enviar e-mail de confirmação
+                await sendEmailVerification(user, {
+                    url: `${window.location.origin}/confirmar-email.html?hash=${senhaHash}&uid=${user.uid}`,
                 });
 
-                await setDoc(doc(db, 'config', 'firstAccess'), {
-                    initialized: true
-                }, { merge: true });
+                // Criar documento do usuário no Firestore
+                await setDoc(doc(db, 'users', user.uid), {
+                    nome,
+                    email,
+                    telefone,
+                    aniversario,
+                    senhaHash,
+                    isAdmin: true,
+                    createdAt: new Date().toISOString(),
+                });
 
-                console.log('Administrador cadastrado com sucesso! UID:', user.uid);
-                window.location.href = 'register-salon.html';
+                // Criar coleções iniciais no Firestore
+                const salonId = user.uid;
+                await setDoc(doc(db, 'salons', salonId), { adminId: user.uid, createdAt: new Date().toISOString() });
+                await setDoc(doc(collection(db, 'salons', salonId, 'estabelecimento')), {});
+                await setDoc(doc(collection(db, 'salons', salonId, 'funcionarios')), {});
+                await setDoc(doc(collection(db, 'salons', salonId, 'servicos')), {});
+                await setDoc(doc(collection(db, 'salons', salonId, 'estoque')), {});
+                await setDoc(doc(collection(db, 'salons', salonId, 'caixa')), {});
+                await setDoc(doc(collection(db, 'salons', salonId, 'agendamento')), {});
+
+                alert('Cadastro realizado com sucesso! Verifique seu e-mail para confirmar.');
+                window.location.href = 'confirmar-email.html';
             } catch (error) {
                 console.error('Erro ao cadastrar:', error);
-                const errorMessage = document.getElementById('adminError');
-                errorMessage.textContent = 'Erro ao cadastrar: ' + error.message;
-                errorMessage.classList.remove('d-none');
+                mensagemErro.classList.remove('d-none');
+                if (error.code === 'auth/unauthorized-continue-uri') {
+                    mensagemErro.textContent = 'Erro: O domínio atual não está autorizado. Por favor, contate o administrador do sistema.';
+                } else if (error.code === 'auth/email-already-in-use') {
+                    mensagemErro.innerHTML = 'Este e-mail já está em uso. Tente outro e-mail ou <a href="login.html">faça login</a>. Esqueceu sua senha? <a href="recuperar-senha.html">Recupere aqui</a>.';
+                } else {
+                    mensagemErro.textContent = 'Erro ao cadastrar: ' + error.message;
+                }
             }
         });
     </script>

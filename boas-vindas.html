@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boas-vindas - UserPluss</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container mt-5 text-center">
+        <h1 class="display-5 fw-bold">Bem-vindo ao UserPluss!</h1>
+        <p class="lead">Vamos te guiar pelas principais funcionalidades do sistema.</p>
+        <div class="card p-4 mt-4">
+            <h3>Teste Experimental: Adicionar um Serviço</h3>
+            <form id="testeServicoForm" class="mt-3">
+                <div class="mb-3">
+                    <label for="nomeServico" class="form-label">Nome do Serviço</label>
+                    <input type="text" id="nomeServico" class="form-control" placeholder="Ex.: Corte de Cabelo" required>
+                </div>
+                <div class="mb-3">
+                    <label for="precoServico" class="form-label">Preço</label>
+                    <input type="number" id="precoServico" class="form-control" placeholder="Ex.: 50.00" step="0.01" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Adicionar Serviço</button>
+            </form>
+            <p id="mensagemSucesso" class="text-success mt-2 d-none"></p>
+            <p id="mensagemErro" class="text-danger mt-2 d-none"></p>
+        </div>
+        <a href="dashboard.html" class="btn btn-primary btn-lg mt-4">Ir para o Dashboard</a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="./src/js/firebase.js"></script>
+    <script type="module">
+        import { auth, db } from './src/js/firebase.js';
+        import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
+        import { doc, getDoc, setDoc, collection } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            const userDoc = await getDoc(doc(db, 'users', user.uid));
+            const userData = userDoc.data();
+            const salonId = userData.salonId;
+
+            document.getElementById('testeServicoForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const nomeServico = document.getElementById('nomeServico').value;
+                const precoServico = parseFloat(document.getElementById('precoServico').value);
+                const mensagemSucesso = document.getElementById('mensagemSucesso');
+                const mensagemErro = document.getElementById('mensagemErro');
+
+                try {
+                    await setDoc(doc(collection(db, 'salons', salonId, 'servicos')), {
+                        nome: nomeServico,
+                        preco: precoServico,
+                        createdAt: new Date().toISOString(),
+                    });
+
+                    mensagemSucesso.textContent = 'Serviço adicionado com sucesso!';
+                    mensagemSucesso.classList.remove('d-none');
+                    mensagemErro.classList.add('d-none');
+                    document.getElementById('testeServicoForm').reset();
+                } catch (error) {
+                    console.error('Erro ao adicionar serviço:', error);
+                    mensagemErro.textContent = 'Erro ao adicionar serviço: ' + error.message;
+                    mensagemErro.classList.remove('d-none');
+                    mensagemSucesso.classList.add('d-none');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

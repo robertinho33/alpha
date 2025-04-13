@@ -2,101 +2,115 @@
 body {
     margin: 0;
     font-family: 'Montserrat', sans-serif;
-    background: #F5F5DC; /* Bege claro */
+    background: linear-gradient(135deg, #F8E1E9, #F5F5DC); /* Gradiente pastel */
 }
 
-/* Menu Lateral */
-.sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 250px;
-    height: 100%;
-    background-color: #b4a7e2; /* Rosa vibrante */
-    padding-top: 20px;
+/* Hero Section */
+.hero-section {
+    min-height: 100vh;
+    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('./src/img/cabelonacintura.jpg') no-repeat center center/cover;
     color: #FFFFFF;
 }
 
-.sidebar h3 {
-    font-family: 'Great Vibes', cursive;
-    font-size: 2rem;
+.hero-section h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+.hero-section p {
+    font-size: 1.25rem;
     margin-bottom: 30px;
 }
 
-.sidebar .nav-link {
-    color: #FFFFFF;
+.hero-section .btn-primary {
+    background-color: #FF6F91;
+    border: none;
+    padding: 12px 30px;
     font-size: 1.1rem;
-    padding: 10px 20px;
+    border-radius: 25px;
     transition: background-color 0.3s ease;
 }
 
-.sidebar .nav-link:hover,
-.sidebar .nav-link.active {
-    background-color: #cbc4e5;
-    border-radius: 5px;
+.hero-section .btn-primary:hover {
+    background-color: #E65B7F;
 }
 
-.sidebar .nav-link.text-danger {
-    color: #FFD1DC; /* Rosa claro para o botão Sair */
+.hero-section img {
+    max-width: 100%;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
-/* Conteúdo Principal */
-.content {
-    margin-left: 250px;
-    padding: 40px;
-    min-height: 100vh;
+/* Páginas de Cadastro e Boas-vindas */
+.container {
+    padding: 40px 20px;
 }
 
-.content h1 {
+h1 {
     font-size: 2.5rem;
-    color: #4A4A4A;
+    color: #7e8184;
     margin-bottom: 20px;
 }
 
-.content p {
-    font-size: 1.2rem;
-    color: #6C757D;
-    margin-bottom: 30px;
+.lead {
+    font-size: 1.25rem;
+    color: #6f7275;
 }
 
-.content .card {
+.card {
     border: none;
     border-radius: 10px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
 }
 
-.content .card-title {
-    font-size: 1.5rem;
-    color: #4A4A4A;
+.form-control {
+    border-radius: 5px;
+    border: 1px solid #F5F5DC;
 }
 
-.content .card-text {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #a4d0f1;
+.btn-primary {
+    background-color: #FF6F91;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #E65B7F;
+}
+
+.btn-outline-primary {
+    border-color: #FF6F91;
+    color: #FF6F91;
+}
+
+.btn-outline-primary:hover {
+    background-color: #FF6F91;
+    color: #FFFFFF;
 }
 
 /* Responsividade */
 @media (max-width: 768px) {
-    .sidebar {
-        width: 200px;
-    }
-
-    .content {
-        margin-left: 200px;
-        padding: 20px;
-    }
-
-    .content h1 {
+    .hero-section h1 {
         font-size: 2rem;
     }
 
-    .content .card-title {
-        font-size: 1.2rem;
+    .hero-section p {
+        font-size: 1rem;
     }
 
-    .content .card-text {
-        font-size: 1.5rem;
+    .hero-section .btn-primary {
+        padding: 10px 20px;
+        font-size: 1rem;
+    }
+
+    .hero-section img {
+        margin-top: 30px;
+    }
+
+    h1 {
+        font-size: 2rem;
     }
 }
