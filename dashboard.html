@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Salão Eco - Gerenciar</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div class="container mt-4">
+    <h1 class="text-center text-primary mb-4">Gerenciar Salão Eco</h1>
+    <button id="sair" class="btn btn-danger mb-4">Sair</button>
+
+    <div class="card mb-4">
+      <div class="card-body">
+        <h2 class="card-title text-success">Adicionar Funcionário</h2>
+        <form id="funcionarioForm">
+          <div class="mb-3"><label for="nomeFuncionario" class="form-label">Nome:</label><input type="text" id="nomeFuncionario" class="form-control"></div>
+          <div class="mb-3"><label for="funcaoFuncionario" class="form-label">Função:</label><input type="text" id="funcaoFuncionario" class="form-control"></div>
+          <div class="mb-3"><label for="comissaoFuncionario" class="form-label">Comissão (%):</label><input type="number" id="comissaoFuncionario" class="form-control" min="0" max="100"></div>
+          <button type="submit" class="btn btn-primary">Adicionar</button>
+        </form>
+      </div>
+    </div>
+    <h2 class="text-success">Funcionários</h2>
+    <ul id="listaFuncionarios" class="list-group mb-4"></ul>
+
+    <div class="card mb-4">
+      <div class="card-body">
+        <h2 class="card-title text-success">Adicionar Cliente</h2>
+        <form id="clienteForm">
+          <div class="mb-3"><label for="nomeCliente" class="form-label">Nome:</label><input type="text" id="nomeCliente" class="form-control"></div>
+          <button type="submit" class="btn btn-primary">Adicionar</button>
+        </form>
+      </div>
+    </div>
+    <h2 class="text-success">Clientes</h2>
+    <ul id="listaClientes" class="list-group mb-4"></ul>
+
+    <div class="card mb-4">
+      <div class="card-body">
+        <h2 class="card-title text-success">Adicionar Serviço</h2>
+        <form id="servicoForm">
+          <div class="mb-3"><label for="nomeServico" class="form-label">Serviço:</label><input type="text" id="nomeServico" class="form-control"></div>
+          <div class="mb-3"><label for="precoServico" class="form-label">Preço (R$):</label><input type="number" id="precoServico" class="form-control"></div>
+          <div class="mb-3"><label for="funcaoServico" class="form-label">Função:</label><input type="text" id="funcaoServico" class="form-control"></div>
+          <div class="mb-3"><label for="comissaoServico" class="form-label">Comissão (%):</label><input type="number" id="comissaoServico" class="form-control" min="0" max="100"></div>
+          <button type="submit" class="btn btn-primary">Adicionar</button>
+        </form>
+      </div>
+    </div>
+    <h2 class="text-success">Serviços</h2>
+    <ul id="listaServicos" class="list-group mb-4"></ul>
+
+    <div class="card mb-4">
+      <div class="card-body">
+        <h2 class="card-title text-success">Abrir Comanda</h2>
+        <form id="comandaForm">
+          <div class="mb-3"><label for="cliente" class="form-label">Cliente:</label><select id="cliente" class="form-select"></select></div>
+          <div class="mb-3">
+            <label class="form-label">Serviços:</label>
+            <div id="servicosContainer">
+             
+            </div>
+            <button type="button" id="adicionarServico" class="btn btn-outline-success mb-2">+ Adicionar outro serviço</button>
+          </div>
+          <div class="mb-3"><label for="data" class="form-label">Data e Hora:</label><input type="datetime-local" id="data" class="form-control"></div>
+          <button type="submit" class="btn btn-primary">Abrir Comanda</button>
+        </form>
+      </div>
+    </div>
+    <h2 class="text-success">Comandas Abertas</h2>
+    <ul id="comandasAbertas" class="list-group mb-4"></ul>
+
+    <div class="card mb-4">
+      <div class="card-body">
+        <h2 class="card-title text-success">Fechar Comanda</h2>
+        <!-- eco/dashboard.html (trecho relevante) -->
+<section>
+  <form id="fecharComandaForm">
+    <select id="comandaSelect" class="form-select mb-3">
+      <option value="">Selecione uma comanda...</option>
+    </select>
+    <!-- Novo: Área para detalhes -->
+    <div id="comandaDetalhes" class="mb-3"></div>
+    <div id="pagamentosContainer"></div>
+    <button id="adicionarPagamento" type="button" class="btn btn-secondary mb-3">Adicionar Pagamento</button>
+    <button type="submit" class="btn btn-primary">Fechar Comanda</button>
+  </form>
+  
+    <div id="pagamentosContainer">
+      <!-- Pagamentos adicionados dinamicamente -->
+    </div>
+    <button type="button" id="adicionarPagamento" class="btn btn-outline-success mb-2">+ Adicionar outro pagamento</button>
+    <button type="submit" class="btn btn-primary">Fechar Comanda</button>
+  </form>
+</section>
+<section>
+  <!-- Lista geral de comissões -->
+<ul id="listaComissoesMensal" class="list-group"></ul>
+
+<!-- Modal -->
+<div class="modal fade" id="detalheComissaoModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="tituloModalComissao">Detalhes da Comissão</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Cliente</th>
+              <th>Serviço</th>
+              <th>Valor</th>
+              <th>Comissão</th>
+            </tr>
+          </thead>
+          <tbody id="tabelaDetalhesComissao"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+</section>
+      </div>
+    </div>
+    <h2 class="text-success">Comandas Fechadas</h2>
+    <ul id="comandasFechadas" class="list-group mb-4"></ul>
+
+    <h2 class="text-success">Comissões dos Profissionais</h2>
+    <ul id="listaComissoes" class="list-group mb-4"></ul>
+  </div>
+  <script type="module" src="src/main.js"></script>
+ <!-- ... -->
+  <script type="module" src="/src/main.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
