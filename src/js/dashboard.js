@@ -5,17 +5,12 @@ import { logoutUsuario } from "../auth/auth.js";
 
 console.log("dashboard.js carregado com sucesso!");
 
-// Função para sanitizar texto (remove tags HTML e caracteres perigosos)
+// Função para sanitizar texto (remove tags HTML)
 function sanitizarTexto(texto) {
   if (!texto) return "";
-  const mapa = {
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#39;'
-  };
-  return texto.replace(/[&<>"']/g, char => mapa[char]).trim();
+  const tempDiv = document.createElement("div");
+  tempDiv.innerHTML = texto;
+  return tempDiv.textContent.trim();
 }
 
 // Função para validar email
@@ -39,6 +34,17 @@ function validarData(data) {
   if (!regex.test(data)) return false;
   const date = new Date(data);
   return date instanceof Date && !isNaN(date);
+}
+
+// Função para mostrar/esconder indicador de carregamento
+function toggleLoading(button, isLoading) {
+  if (isLoading) {
+    button.disabled = true;
+    button.textContent = "Salvando...";
+  } else {
+    button.disabled = false;
+    button.textContent = button.id === "adicionarMaisServico" || button.id === "adicionarMaisFuncionario" ? "Adicionar Mais" : "Salvar";
+  }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -68,17 +74,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Botão de logout
     const botaoSair = document.getElementById("botaoSair");
-    if (botaoSair) {
-      botaoSair.addEventListener("click", async () => {
-        try {
-          await logoutUsuario();
-          window.location.href = "index.html";
-        } catch (error) {
-          console.error("Erro ao sair:", error);
-          alert("Erro ao sair: " + error.message);
-        }
-      });
+if (botaoSair) {
+  botaoSair.addEventListener("click", async () => {
+    try {
+      console.log("Tentando logout...");
+      await logoutUsuario();
+      console.log("Logout bem-sucedido, redirecionando...");
+      window.location.href = "index.html";
+    } catch (error) {
+      console.error("Erro ao sair:", error);
+      alert("Não foi possível sair. Tente novamente ou contate o suporte: " + error.message);
     }
+  });
+}
 
     // Função para renderizar clientes
     async function renderClientes(filtros = {}) {
@@ -147,6 +155,89 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       });
     }
+
+    // Resetar formulário ao abrir o modal de adicionar cliente
+    document.querySelector('[data-bs-target="#clienteModal"]').addEventListener("click", () => {
+      const clienteForm = document.getElementById("clienteForm");
+      clienteForm.reset();
+      document.getElementById("clienteId").value = "";
+      document.getElementById("clienteModalLabel").textContent = "Adicionar Cliente";
+      document.getElementById("ativoCliente").checked = true;
+    });
+
+    // Adiciona ou edita cliente
+const clienteForm = document.getElementById("clienteForm");
+const clienteModalLabel = document.getElementById("clienteModalLabel");
+if (clienteForm) {
+  clienteForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const clienteId = document.getElementById("clienteId").value;
+    const nome = sanitizarTexto(document.getElementById("nomeCliente").value);
+    const telefone = sanitizarTexto(document.getElementById("telefoneCliente").value);
+    const email = sanitizarTexto(document.getElementById("emailCliente").value);
+    const aniversario = document.getElementById("aniversarioCliente").value;
+    const observacoes = sanitizarTexto(document.getElementById("observacoesCliente").value);
+    const ativo = document.getElementById("ativoCliente").checked;
+    const submitButton = e.submitter;
+    const isAdicionarMais = e.submitter.id === "adicionarMaisCliente";
+
+    // Validações
+    if (!nome || nome.length > 100) {
+      alert("Nome é obrigatório e deve ter até 100 caracteres.");
+      return;
+    }
+    if (telefone && !validarTelefone(telefone)) {
+      alert("Telefone inválido. Use formato (XX) XXXXX-XXXX ou apenas dígitos.");
+      return;
+    }
+    if (email && !validarEmail(email)) {
+      alert("Email inválido.");
+      return;
+    }
+    if (aniversario && !validarData(aniversario)) {
+      alert("Data de aniversário inválida. Use formato YYYY-MM-DD.");
+      return;
+    }
+    if (observacoes && observacoes.length > 500) {
+      alert("Observações devem ter até 500 caracteres.");
+      return;
+    }
+
+    const clienteData = {
+      nome,
+      telefone: telefone || null,
+      email: email || null,
+      aniversario: aniversario || null,
+      observacoes: observacoes || null,
+      ativo,
+      criadoEm: clienteId ? undefined : new Date().toISOString()
+    };
+
+    try {
+      toggleLoading(submitButton, true);
+      if (clienteId) {
+        await atualizarCliente(user.uid, clienteId, clienteData);
+        alert("Cliente atualizado!");
+      } else {
+        await adicionarCliente(user.uid, clienteData);
+        alert("Cliente adicionado!");
+      }
+      renderClientes();
+      clienteForm.reset();
+      document.getElementById("clienteId").value = "";
+      clienteModalLabel.textContent = "Adicionar Cliente";
+      document.getElementById("ativoCliente").checked = true;
+      if (!isAdicionarMais) {
+        bootstrap.Modal.getInstance(document.getElementById("clienteModal")).hide();
+      }
+    } catch (error) {
+      console.error("Erro ao salvar cliente:", error);
+      alert(`Erro ao salvar cliente: ${error.message.includes("obrigatório") ? error.message : "Ocorreu um erro. Tente novamente."}`);
+    } finally {
+      toggleLoading(submitButton, false);
+    }
+  });
+}
 
     // Função para renderizar serviços
     async function renderServicos(filtros = {}) {
@@ -283,72 +374,6 @@ document.addEventListener("DOMContentLoaded", () => {
     await renderServicos();
     await renderFuncionarios();
 
-    // Adiciona ou edita cliente
-    const clienteForm = document.getElementById("clienteForm");
-    const clienteModalLabel = document.getElementById("clienteModalLabel");
-    if (clienteForm) {
-      clienteForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const clienteId = document.getElementById("clienteId").value;
-        const nome = sanitizarTexto(document.getElementById("nomeCliente").value);
-        const telefone = sanitizarTexto(document.getElementById("telefoneCliente").value);
-        const email = sanitizarTexto(document.getElementById("emailCliente").value);
-        const aniversario = document.getElementById("aniversarioCliente").value;
-        const observacoes = sanitizarTexto(document.getElementById("observacoesCliente").value);
-        const ativo = document.getElementById("ativoCliente").checked;
-
-        // Validações
-        if (!nome || nome.length > 100) {
-          alert("Nome é obrigatório e deve ter até 100 caracteres.");
-          return;
-        }
-        if (telefone && !validarTelefone(telefone)) {
-          alert("Telefone inválido. Use formato (XX) XXXXX-XXXX ou apenas dígitos.");
-          return;
-        }
-        if (email && !validarEmail(email)) {
-          alert("Email inválido.");
-          return;
-        }
-        if (aniversario && !validarData(aniversario)) {
-          alert("Data de aniversário inválida. Use formato YYYY-MM-DD.");
-          return;
-        }
-        if (observacoes && observacoes.length > 500) {
-          alert("Observações devem ter até 500 caracteres.");
-          return;
-        }
-
-        const clienteData = {
-          nome,
-          telefone: telefone || null,
-          email: email || null,
-          aniversario: aniversario || null,
-          observacoes: observacoes || null,
-          ativo,
-          criadoEm: clienteId ? undefined : new Date().toISOString()
-        };
-
-        try {
-          if (clienteId) {
-            await atualizarCliente(user.uid, clienteId, clienteData);
-            alert("Cliente atualizado!");
-          } else {
-            await adicionarCliente(user.uid, clienteData);
-            alert("Cliente adicionado!");
-          }
-          renderClientes();
-          clienteForm.reset();
-          clienteModalLabel.textContent = "Adicionar Cliente";
-          document.getElementById("ativoCliente").checked = true;
-          bootstrap.Modal.getInstance(document.getElementById("clienteModal")).hide();
-        } catch (error) {
-          console.error("Erro ao salvar cliente:", error);
-          alert("Erro ao salvar cliente: " + error.message);
-        }
-      });
-    }
-
     // Adiciona ou edita serviço
     const servicoForm = document.getElementById("servicoForm");
     const servicoModalLabel = document.getElementById("servicoModalLabel");
@@ -364,6 +389,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const tipoProfissional = sanitizarTexto(document.getElementById("tipoProfissional").value);
         const ativo = document.getElementById("ativoServico").checked;
         const isAdicionarMais = e.submitter.id === "adicionarMaisServico";
+        const submitButton = e.submitter;
 
         // Validações
         if (!nome || nome.length > 100) {
@@ -402,6 +428,7 @@ document.addEventListener("DOMContentLoaded", () => {
         };
 
         try {
+          toggleLoading(submitButton, true);
           if (servicoId) {
             await atualizarServico(user.uid, servicoId, servicoData);
             alert("Serviço atualizado!");
@@ -419,7 +446,9 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         } catch (error) {
           console.error("Erro ao salvar serviço:", error);
-          alert("Erro ao salvar serviço: " + error.message);
+          alert(`Erro ao salvar serviço: ${error.message.includes("obrigatório") ? error.message : "Ocorreu um erro. Tente novamente."}`);
+        } finally {
+          toggleLoading(submitButton, false);
         }
       });
     }
@@ -446,6 +475,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const email = sanitizarTexto(document.getElementById("emailFuncionario").value);
         const ativo = document.getElementById("ativoFuncionario").checked;
         const isAdicionarMais = e.submitter.id === "adicionarMaisFuncionario";
+        const submitButton = e.submitter;
 
         // Validações
         if (!nome || nome.length > 100) {
@@ -474,6 +504,7 @@ document.addEventListener("DOMContentLoaded", () => {
         };
 
         try {
+          toggleLoading(submitButton, true);
           if (funcionarioId) {
             await atualizarFuncionario(user.uid, funcionarioId, funcionarioData);
             alert("Funcionário atualizado!");
@@ -483,6 +514,7 @@ document.addEventListener("DOMContentLoaded", () => {
           }
           renderFuncionarios();
           funcionarioForm.reset();
+          document.getElementById("funcionarioId").value = "";
           funcionarioModalLabel.textContent = "Adicionar Funcionário";
           document.getElementById("ativoFuncionario").checked = true;
           if (!isAdicionarMais) {
@@ -490,10 +522,21 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         } catch (error) {
           console.error("Erro ao salvar funcionário:", error);
-          alert("Erro ao salvar funcionário: " + error.message);
+          alert(`Erro ao salvar funcionário: ${error.message.includes("obrigatório") ? error.message : "Ocorreu um erro. Tente novamente."}`);
+        } finally {
+          toggleLoading(submitButton, false);
         }
       });
     }
+
+    // Resetar formulário ao abrir o modal de adicionar funcionário
+    document.querySelector('[data-bs-target="#funcionarioModal"]').addEventListener("click", () => {
+      const funcionarioForm = document.getElementById("funcionarioForm");
+      funcionarioForm.reset();
+      document.getElementById("funcionarioId").value = "";
+      document.getElementById("funcionarioModalLabel").textContent = "Adicionar Funcionário";
+      document.getElementById("ativoFuncionario").checked = true;
+    });
 
     // Aplicar filtros de clientes
     const filtroClientes = document.getElementById("filtroClientes");
@@ -503,10 +546,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const filtros = {
           nome: sanitizarTexto(document.getElementById("filtroNome").value),
           email: sanitizarTexto(document.getElementById("filtroEmail").value),
-          aniversario: document.getElementById("filtroAniversario").value
+          aniversario: sanitizarTexto(document.getElementById("filtroAniversario").value)
         };
         if (filtros.aniversario && !validarData(filtros.aniversario)) {
-          alert("Data de filtro inválida.");
+          alert("Data de filtro inválida. Use formato YYYY-MM-DD.");
           return;
         }
         await renderClientes(filtros);
@@ -521,7 +564,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const filtros = {
           tipoProfissional: sanitizarTexto(document.getElementById("filtroTipoProfissional").value),
           tipo: sanitizarTexto(document.getElementById("filtroTipo").value),
-          ativo: document.getElementById("filtroAtivo").value
+          ativo: sanitizarTexto(document.getElementById("filtroAtivo").value)
         };
         await renderServicos(filtros);
       });
