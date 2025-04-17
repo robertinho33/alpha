@@ -18,3 +18,10 @@ export async function loginUsuario(email, password) {
     throw new Error(`Erro ao logar: ${error.message}`);
   }
 }
+export async function logoutUsuario(email, password) {
+  try {
+    await signOut(auth);
+  } catch (error) {
+    throw new Error("Erro ao deslogar: " + error.message);
+  }
+}

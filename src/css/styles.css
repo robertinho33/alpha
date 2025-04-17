@@ -1,0 +1,147 @@
+/* Tema do Meu Salão Online */
+:root {
+    --primary-color: #d81b60; /* Rosa vibrante */
+    --secondary-color: #6d4c41; /* Marrom elegante */
+    --accent-color: #f8bbd0; /* Rosa claro */
+    --text-color: #333333;
+    --bg-color: #f5f5f5;
+  }
+  
+  /* Estilizar o body */
+  body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Roboto', sans-serif;
+  }
+  
+  /* Header */
+  header {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  header h1, header h3 {
+    font-family: 'Playfair Display', serif;
+    margin: 0;
+  }
+  
+  #botaoSair {
+    transition: background-color 0.3s ease;
+  }
+  
+  #botaoSair:hover {
+    background-color: var(--accent-color) !important;
+    color: var(--text-color) !important;
+  }
+  
+  /* Container principal */
+  .container {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  }
+  
+  /* Títulos */
+  h2, h3 {
+    color: var(--primary-color);
+    font-family: 'Playfair Display', serif;
+  }
+  
+  /* Botões */
+  .btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    transition: background-color 0.3s ease;
+  }
+  
+  .btn-primary:hover {
+    background-color: var(--secondary-color);
+    border-color: var(--secondary-color);
+  }
+  
+  .btn-secondary {
+    background-color: var(--secondary-color);
+    border-color: var(--secondary-color);
+  }
+  
+  .btn-secondary:hover {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+  }
+  
+  .btn-warning {
+    background-color: #ffb300;
+  }
+  
+  .btn-danger {
+    background-color: #c62828;
+  }
+  
+  /* Tabelas */
+  .table {
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  .table th {
+    background-color: var(--accent-color);
+    color: var(--text-color);
+  }
+  
+  .table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(248, 187, 208, 0.1);
+  }
+  
+  /* Formulários */
+  .form-control {
+    border-radius: 6px;
+    border: 1px solid var(--accent-color);
+  }
+  
+  .form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 5px rgba(216, 27, 96, 0.3);
+  }
+  
+  /* Modais */
+  .modal-content {
+    border-radius: 10px;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .modal-header {
+    background-color: var(--primary-color);
+    color: white;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+  }
+  
+  .modal-header .btn-close {
+    filter: invert(1);
+  }
+  
+  .modal-body {
+    padding: 20px;
+  }
+  
+  /* Responsividade */
+  @media (max-width: 768px) {
+    .container {
+      padding: 15px;
+    }
+  
+    .table {
+      font-size: 14px;
+    }
+  
+    .btn {
+      padding: 8px 12px;
+      font-size: 14px;
+    }
+  
+    .modal-dialog {
+      margin: 10px;
+    }
+  }

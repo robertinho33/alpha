@@ -1,8 +1,45 @@
 import { auth } from "../firebase/firebase-init.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
 import { buscarDadosSalao, adicionarCliente, listarClientes, atualizarCliente, excluirCliente, adicionarServico, listarServicos, atualizarServico, excluirServico, adicionarFuncionario, listarFuncionarios, atualizarFuncionario, excluirFuncionario } from "../db/firestore.js";
+import { logoutUsuario } from "../auth/auth.js";
 
 console.log("dashboard.js carregado com sucesso!");
+
+// Função para sanitizar texto (remove tags HTML e caracteres perigosos)
+function sanitizarTexto(texto) {
+  if (!texto) return "";
+  const mapa = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  };
+  return texto.replace(/[&<>"']/g, char => mapa[char]).trim();
+}
+
+// Função para validar email
+function validarEmail(email) {
+  if (!email) return true; // Email é opcional
+  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return regex.test(email);
+}
+
+// Função para validar telefone
+function validarTelefone(telefone) {
+  if (!telefone) return true; // Telefone é opcional
+  const regex = /^\d{10,11}$|^\(\d{2}\)\s?\d{4,5}-\d{4}$/;
+  return regex.test(telefone.replace(/\D/g, '') || telefone);
+}
+
+// Função para validar data
+function validarData(data) {
+  if (!data) return true; // Data é opcional
+  const regex = /^\d{4}-\d{2}-\d{2}$/;
+  if (!regex.test(data)) return false;
+  const date = new Date(data);
+  return date instanceof Date && !isNaN(date);
+}
 
 document.addEventListener("DOMContentLoaded", () => {
   onAuthStateChanged(auth, async (user) => {
@@ -16,8 +53,8 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const dadosSalao = await buscarDadosSalao(user.uid);
       if (dadosSalao) {
-        document.getElementById("nomeSalao").textContent = dadosSalao.salao.nome;
-        document.getElementById("nomeAdmin").textContent = dadosSalao.admin.nome;
+        document.getElementById("nomeSalao").textContent = sanitizarTexto(dadosSalao.salao.nome);
+        document.getElementById("nomeAdmin").textContent = sanitizarTexto(dadosSalao.admin.nome);
       } else {
         console.error("Dados do salão não encontrados.");
         document.getElementById("nomeSalao").textContent = "Salão não encontrado";
@@ -27,6 +64,20 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error("Erro ao carregar dados:", error);
       document.getElementById("nomeSalao").textContent = "Erro ao carregar";
       document.getElementById("nomeAdmin").textContent = "Erro ao carregar";
+    }
+
+    // Botão de logout
+    const botaoSair = document.getElementById("botaoSair");
+    if (botaoSair) {
+      botaoSair.addEventListener("click", async () => {
+        try {
+          await logoutUsuario();
+          window.location.href = "index.html";
+        } catch (error) {
+          console.error("Erro ao sair:", error);
+          alert("Erro ao sair: " + error.message);
+        }
+      });
     }
 
     // Função para renderizar clientes
@@ -49,11 +100,11 @@ document.addEventListener("DOMContentLoaded", () => {
       clientes.forEach(cliente => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
-          <td>${cliente.nome}</td>
-          <td>${cliente.telefone || "Não informado"}</td>
-          <td>${cliente.email || "Não informado"}</td>
-          <td>${cliente.aniversario || "Não informado"}</td>
-          <td>${cliente.observacoes || "Nenhuma"}</td>
+          <td>${sanitizarTexto(cliente.nome)}</td>
+          <td>${sanitizarTexto(cliente.telefone) || "Não informado"}</td>
+          <td>${sanitizarTexto(cliente.email) || "Não informado"}</td>
+          <td>${sanitizarTexto(cliente.aniversario) || "Não informado"}</td>
+          <td>${sanitizarTexto(cliente.observacoes) || "Nenhuma"}</td>
           <td>${cliente.ativo ? "Sim" : "Não"}</td>
           <td>
             <button class="btn btn-sm btn-warning editar-cliente" data-id="${cliente.id}">Editar</button>
@@ -104,10 +155,10 @@ document.addEventListener("DOMContentLoaded", () => {
       let servicos = await listarServicos(user.uid);
 
       if (filtros.tipoProfissional && filtros.tipoProfissional !== "") {
-        servicos = servicos.filter(s => s.tipoProfissional === filtros.tipoProfissional);
+        servicos = servicos.filter(s => s.tipoProfissional.toLowerCase().includes(filtros.tipoProfissional.toLowerCase()));
       }
       if (filtros.tipo && filtros.tipo !== "") {
-        servicos = servicos.filter(s => s.tipo === filtros.tipo);
+        servicos = servicos.filter(s => s.tipo.toLowerCase().includes(filtros.tipo.toLowerCase()));
       }
       if (filtros.ativo && filtros.ativo !== "") {
         servicos = servicos.filter(s => s.ativo.toString() === filtros.ativo);
@@ -117,12 +168,12 @@ document.addEventListener("DOMContentLoaded", () => {
       servicos.forEach(servico => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
-          <td>${servico.nome}</td>
-          <td>${servico.tipo}</td>
+          <td>${sanitizarTexto(servico.nome)}</td>
+          <td>${sanitizarTexto(servico.tipo)}</td>
           <td>R$${servico.preco.toFixed(2)}</td>
           <td>${servico.duracaoMinutos} min</td>
           <td>${servico.comissaoPercentual}%</td>
-          <td>${servico.tipoProfissional}</td>
+          <td>${sanitizarTexto(servico.tipoProfissional)}</td>
           <td>${servico.ativo ? "Sim" : "Não"}</td>
           <td>
             <button class="btn btn-sm btn-warning editar-servico" data-id="${servico.id}">Editar</button>
@@ -177,10 +228,10 @@ document.addEventListener("DOMContentLoaded", () => {
         funcionarios.forEach(funcionario => {
           const tr = document.createElement("tr");
           tr.innerHTML = `
-            <td>${funcionario.nome}</td>
-            <td>${funcionario.tipoProfissional}</td>
-            <td>${funcionario.telefone || "Não informado"}</td>
-            <td>${funcionario.email || "Não informado"}</td>
+            <td>${sanitizarTexto(funcionario.nome)}</td>
+            <td>${sanitizarTexto(funcionario.tipoProfissional)}</td>
+            <td>${sanitizarTexto(funcionario.telefone) || "Não informado"}</td>
+            <td>${sanitizarTexto(funcionario.email) || "Não informado"}</td>
             <td>${funcionario.ativo ? "Sim" : "Não"}</td>
             <td>
               <button class="btn btn-sm btn-warning editar-funcionario" data-id="${funcionario.id}">Editar</button>
@@ -239,13 +290,42 @@ document.addEventListener("DOMContentLoaded", () => {
       clienteForm.addEventListener("submit", async (e) => {
         e.preventDefault();
         const clienteId = document.getElementById("clienteId").value;
+        const nome = sanitizarTexto(document.getElementById("nomeCliente").value);
+        const telefone = sanitizarTexto(document.getElementById("telefoneCliente").value);
+        const email = sanitizarTexto(document.getElementById("emailCliente").value);
+        const aniversario = document.getElementById("aniversarioCliente").value;
+        const observacoes = sanitizarTexto(document.getElementById("observacoesCliente").value);
+        const ativo = document.getElementById("ativoCliente").checked;
+
+        // Validações
+        if (!nome || nome.length > 100) {
+          alert("Nome é obrigatório e deve ter até 100 caracteres.");
+          return;
+        }
+        if (telefone && !validarTelefone(telefone)) {
+          alert("Telefone inválido. Use formato (XX) XXXXX-XXXX ou apenas dígitos.");
+          return;
+        }
+        if (email && !validarEmail(email)) {
+          alert("Email inválido.");
+          return;
+        }
+        if (aniversario && !validarData(aniversario)) {
+          alert("Data de aniversário inválida. Use formato YYYY-MM-DD.");
+          return;
+        }
+        if (observacoes && observacoes.length > 500) {
+          alert("Observações devem ter até 500 caracteres.");
+          return;
+        }
+
         const clienteData = {
-          nome: document.getElementById("nomeCliente").value,
-          telefone: document.getElementById("telefoneCliente").value || null,
-          email: document.getElementById("emailCliente").value || null,
-          aniversario: document.getElementById("aniversarioCliente").value || null,
-          observacoes: document.getElementById("observacoesCliente").value || null,
-          ativo: document.getElementById("ativoCliente").checked,
+          nome,
+          telefone: telefone || null,
+          email: email || null,
+          aniversario: aniversario || null,
+          observacoes: observacoes || null,
+          ativo,
           criadoEm: clienteId ? undefined : new Date().toISOString()
         };
 
@@ -276,14 +356,49 @@ document.addEventListener("DOMContentLoaded", () => {
       servicoForm.addEventListener("submit", async (e) => {
         e.preventDefault();
         const servicoId = document.getElementById("servicoId").value;
+        const nome = sanitizarTexto(document.getElementById("nomeServico").value);
+        const tipo = sanitizarTexto(document.getElementById("tipoServico").value);
+        const preco = parseFloat(document.getElementById("precoServico").value);
+        const duracaoMinutos = parseInt(document.getElementById("duracaoServico").value);
+        const comissaoPercentual = parseInt(document.getElementById("comissaoServico").value);
+        const tipoProfissional = sanitizarTexto(document.getElementById("tipoProfissional").value);
+        const ativo = document.getElementById("ativoServico").checked;
+        const isAdicionarMais = e.submitter.id === "adicionarMaisServico";
+
+        // Validações
+        if (!nome || nome.length > 100) {
+          alert("Nome é obrigatório e deve ter até 100 caracteres.");
+          return;
+        }
+        if (!tipo || tipo.length > 50) {
+          alert("Tipo é obrigatório e deve ter até 50 caracteres.");
+          return;
+        }
+        if (isNaN(preco) || preco < 0) {
+          alert("Preço deve ser um número positivo.");
+          return;
+        }
+        if (isNaN(duracaoMinutos) || duracaoMinutos <= 0 || duracaoMinutos > 1440) {
+          alert("Duração deve ser um número entre 1 e 1440 minutos.");
+          return;
+        }
+        if (isNaN(comissaoPercentual) || comissaoPercentual < 0 || comissaoPercentual > 100) {
+          alert("Comissão deve ser um número entre 0 e 100.");
+          return;
+        }
+        if (!tipoProfissional || tipoProfissional.length > 50) {
+          alert("Tipo Profissional é obrigatório e deve ter até 50 caracteres.");
+          return;
+        }
+
         const servicoData = {
-          nome: document.getElementById("nomeServico").value,
-          tipo: document.getElementById("tipoServico").value,
-          preco: parseFloat(document.getElementById("precoServico").value),
-          duracaoMinutos: parseInt(document.getElementById("duracaoServico").value),
-          comissaoPercentual: parseInt(document.getElementById("comissaoServico").value),
-          tipoProfissional: document.getElementById("tipoProfissional").value,
-          ativo: document.getElementById("ativoServico").checked
+          nome,
+          tipo,
+          preco,
+          duracaoMinutos,
+          comissaoPercentual,
+          tipoProfissional,
+          ativo
         };
 
         try {
@@ -296,14 +411,27 @@ document.addEventListener("DOMContentLoaded", () => {
           }
           renderServicos();
           servicoForm.reset();
+          document.getElementById("servicoId").value = "";
           servicoModalLabel.textContent = "Adicionar Serviço";
-          bootstrap.Modal.getInstance(document.getElementById("servicoModal")).hide();
+          document.getElementById("ativoServico").checked = true;
+          if (!isAdicionarMais) {
+            bootstrap.Modal.getInstance(document.getElementById("servicoModal")).hide();
+          }
         } catch (error) {
           console.error("Erro ao salvar serviço:", error);
           alert("Erro ao salvar serviço: " + error.message);
         }
       });
     }
+
+    // Resetar formulário ao abrir o modal de adicionar serviço
+    document.querySelector('[data-bs-target="#servicoModal"]').addEventListener("click", () => {
+      const servicoForm = document.getElementById("servicoForm");
+      servicoForm.reset();
+      document.getElementById("servicoId").value = "";
+      document.getElementById("servicoModalLabel").textContent = "Adicionar Serviço";
+      document.getElementById("ativoServico").checked = true;
+    });
 
     // Adiciona ou edita funcionário
     const funcionarioForm = document.getElementById("funcionarioForm");
@@ -312,12 +440,37 @@ document.addEventListener("DOMContentLoaded", () => {
       funcionarioForm.addEventListener("submit", async (e) => {
         e.preventDefault();
         const funcionarioId = document.getElementById("funcionarioId").value;
+        const nome = sanitizarTexto(document.getElementById("nomeFuncionario").value);
+        const tipoProfissional = sanitizarTexto(document.getElementById("tipoProfissionalFuncionario").value);
+        const telefone = sanitizarTexto(document.getElementById("telefoneFuncionario").value);
+        const email = sanitizarTexto(document.getElementById("emailFuncionario").value);
+        const ativo = document.getElementById("ativoFuncionario").checked;
+        const isAdicionarMais = e.submitter.id === "adicionarMaisFuncionario";
+
+        // Validações
+        if (!nome || nome.length > 100) {
+          alert("Nome é obrigatório e deve ter até 100 caracteres.");
+          return;
+        }
+        if (!tipoProfissional || tipoProfissional.length > 50) {
+          alert("Tipo Profissional é obrigatório e deve ter até 50 caracteres.");
+          return;
+        }
+        if (telefone && !validarTelefone(telefone)) {
+          alert("Telefone inválido. Use formato (XX) XXXXX-XXXX ou apenas dígitos.");
+          return;
+        }
+        if (email && !validarEmail(email)) {
+          alert("Email inválido.");
+          return;
+        }
+
         const funcionarioData = {
-          nome: document.getElementById("nomeFuncionario").value,
-          tipoProfissional: document.getElementById("tipoProfissionalFuncionario").value,
-          telefone: document.getElementById("telefoneFuncionario").value || null,
-          email: document.getElementById("emailFuncionario").value || null,
-          ativo: document.getElementById("ativoFuncionario").checked
+          nome,
+          tipoProfissional,
+          telefone: telefone || null,
+          email: email || null,
+          ativo
         };
 
         try {
@@ -332,7 +485,9 @@ document.addEventListener("DOMContentLoaded", () => {
           funcionarioForm.reset();
           funcionarioModalLabel.textContent = "Adicionar Funcionário";
           document.getElementById("ativoFuncionario").checked = true;
-          bootstrap.Modal.getInstance(document.getElementById("funcionarioModal")).hide();
+          if (!isAdicionarMais) {
+            bootstrap.Modal.getInstance(document.getElementById("funcionarioModal")).hide();
+          }
         } catch (error) {
           console.error("Erro ao salvar funcionário:", error);
           alert("Erro ao salvar funcionário: " + error.message);
@@ -346,10 +501,14 @@ document.addEventListener("DOMContentLoaded", () => {
       filtroClientes.addEventListener("submit", async (e) => {
         e.preventDefault();
         const filtros = {
-          nome: document.getElementById("filtroNome").value,
-          email: document.getElementById("filtroEmail").value,
+          nome: sanitizarTexto(document.getElementById("filtroNome").value),
+          email: sanitizarTexto(document.getElementById("filtroEmail").value),
           aniversario: document.getElementById("filtroAniversario").value
         };
+        if (filtros.aniversario && !validarData(filtros.aniversario)) {
+          alert("Data de filtro inválida.");
+          return;
+        }
         await renderClientes(filtros);
       });
     }
@@ -360,8 +519,8 @@ document.addEventListener("DOMContentLoaded", () => {
       filtroServicos.addEventListener("submit", async (e) => {
         e.preventDefault();
         const filtros = {
-          tipoProfissional: document.getElementById("filtroTipoProfissional").value,
-          tipo: document.getElementById("filtroTipo").value,
+          tipoProfissional: sanitizarTexto(document.getElementById("filtroTipoProfissional").value),
+          tipo: sanitizarTexto(document.getElementById("filtroTipo").value),
           ativo: document.getElementById("filtroAtivo").value
         };
         await renderServicos(filtros);
