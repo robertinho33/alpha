@@ -539,35 +539,36 @@ if (clienteForm) {
     });
 
     // Aplicar filtros de clientes
-    const filtroClientes = document.getElementById("filtroClientes");
-    if (filtroClientes) {
-      filtroClientes.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const filtros = {
-          nome: sanitizarTexto(document.getElementById("filtroNome").value),
-          email: sanitizarTexto(document.getElementById("filtroEmail").value),
-          aniversario: sanitizarTexto(document.getElementById("filtroAniversario").value)
-        };
-        if (filtros.aniversario && !validarData(filtros.aniversario)) {
-          alert("Data de filtro inválida. Use formato YYYY-MM-DD.");
-          return;
-        }
-        await renderClientes(filtros);
-      });
+const filtroClientes = document.getElementById("filtroClientes");
+if (filtroClientes) {
+  filtroClientes.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const filtros = {
+      nome: sanitizarTexto(document.getElementById("filtroNome").value),
+      email: sanitizarTexto(document.getElementById("filtroEmail").value),
+      aniversario: sanitizarTexto(document.getElementById("filtroAniversario").value)
+    };
+    if (filtros.aniversario && !validarData(filtros.aniversario)) {
+      alert("Data de filtro inválida. Use formato YYYY-MM-DD.");
+      return;
     }
+    await renderClientes(filtros);
+  });
+}
 
-    // Aplicar filtros de serviços
-    const filtroServicos = document.getElementById("filtroServicos");
-    if (filtroServicos) {
-      filtroServicos.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const filtros = {
-          tipoProfissional: sanitizarTexto(document.getElementById("filtroTipoProfissional").value),
-          tipo: sanitizarTexto(document.getElementById("filtroTipo").value),
-          ativo: sanitizarTexto(document.getElementById("filtroAtivo").value)
-        };
-        await renderServicos(filtros);
-      });
+// Aplicar filtros de serviços
+const filtroServicos = document.getElementById("filtroServicos");
+if (filtroServicos) {
+  filtroServicos.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const filtros = {
+      tipoProfissional: sanitizarTexto(document.getElementById("filtroTipoProfissional").value),
+      tipo: sanitizarTexto(document.getElementById("filtroTipo").value),
+      ativo: sanitizarTexto(document.getElementById("filtroAtivo").value)
+    };
+    await renderServicos(filtros);
+  });
+
     }
   });
 });
