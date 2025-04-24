@@ -94,3 +94,14 @@ h1, h2, h3 {
 #pagamentosFeedback {
   display: none;
 }
+.logo-comercio {
+  max-height: 50px;
+  margin-right: 10px;
+}
+body {
+  font-family: 'Poppins', sans-serif;
+}
+
+aside h5 {
+  font-weight: 600;
+}

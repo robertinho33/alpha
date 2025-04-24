@@ -3,89 +3,52 @@ import { createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebase
 import { doc, setDoc } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-  const form = document.getElementById('cadastroComercioForm');
+  const cadastroForm = document.getElementById('cadastroForm');
   const errorDiv = document.getElementById('formError');
   const successDiv = document.getElementById('formSuccess');
 
-  if (!form) {
-    console.warn('Formulário de cadastro não encontrado.');
+  if (!cadastroForm || !errorDiv || !successDiv) {
+    console.error('Elementos DOM não encontrados:', {
+      cadastroForm: !!cadastroForm,
+      errorDiv: !!errorDiv,
+      successDiv: !!successDiv
+    });
     return;
   }
 
-  form.addEventListener('submit', async (event) => {
+  cadastroForm.addEventListener('submit', async (event) => {
     event.preventDefault();
-    event.stopPropagation();
-
-    if (!form.checkValidity()) {
-      form.classList.add('was-validated');
-      return;
-    }
-
-    const nomeFantasia = form.querySelector('#nomeFantasia').value.trim();
-    const razaoSocial = form.querySelector('#razaoSocial').value.trim();
-    const email = form.querySelector('#email').value.trim();
-    const emailGestor = form.querySelector('#emailGestor').value.trim();
-    const senha = form.querySelector('#senha').value;
-    const cnpj = form.querySelector('#cnpj').value.trim();
-    const telefoneComercial = form.querySelector('#telefoneComercial').value.trim();
-    const telefoneGestor = form.querySelector('#telefoneGestor').value.trim();
-    const enderecoComercial = form.querySelector('#enderecoComercial').value.trim();
-    const segmento = form.querySelector('#segmento').value;
-    const cidade = form.querySelector('#cidade').value.trim();
-    const estado = form.querySelector('#estado').value.trim().toUpperCase();
-    const horarioFuncionamento = form.querySelector('#horarioFuncionamento').value.trim();
-    const descricao = form.querySelector('#descricao').value.trim();
-
-    // Validação adicional
-    if (descricao.length > 200) {
-      errorDiv.textContent = 'A descrição deve ter no máximo 200 caracteres.';
-      errorDiv.classList.remove('d-none');
-      return;
-    }
-
     errorDiv.classList.add('d-none');
     successDiv.classList.add('d-none');
+
+    if (!cadastroForm.checkValidity()) {
+      cadastroForm.classList.add('was-validated');
+      return;
+    }
+
+    const nomeFantasia = document.getElementById('nomeFantasia').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const senha = document.getElementById('senha').value.trim();
+    const telefoneComercial = document.getElementById('telefoneComercial').value.trim() || null;
 
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, senha);
       const user = userCredential.user;
-
       await setDoc(doc(db, 'comercios', user.uid), {
         nomeFantasia,
-        razaoSocial: razaoSocial || null,
         email,
-        emailGestor: emailGestor || null,
-        cnpj: cnpj || null,
-        telefoneComercial: telefoneComercial || null,
-        telefoneGestor: telefoneGestor || null,
-        enderecoComercial: enderecoComercial || null,
-        segmento,
-        cidade,
-        estado,
-        horarioFuncionamento: horarioFuncionamento || null,
-        descricao: descricao || null,
+        telefoneComercial,
         createdAt: new Date().toISOString()
       });
-
       successDiv.textContent = 'Comércio cadastrado com sucesso! Redirecionando...';
       successDiv.classList.remove('d-none');
-
-      setTimeout(() => {
-        window.location.href = 'configuracao-estabelecimento.html';
-      }, 2000);
+      setTimeout(() => window.location.href = 'login.html', 2000);
     } catch (error) {
-      let errorMessage = 'Ocorreu um erro. Tente novamente.';
-      if (error.code === 'auth/email-already-in-use') {
-        errorMessage = 'Este email já está cadastrado.';
-      } else if (error.code === 'auth/invalid-email') {
-        errorMessage = 'Email inválido.';
-      } else if (error.code === 'auth/weak-password') {
-        errorMessage = 'A senha é muito fraca. Use pelo menos 6 caracteres.';
-      }
-
-      errorDiv.textContent = errorMessage;
+      console.error('Erro ao cadastrar:', error);
+      errorDiv.textContent = error.code === 'auth/email-already-in-use'
+        ? 'E-mail já está em uso.'
+        : 'Erro ao cadastrar: ' + error.message;
       errorDiv.classList.remove('d-none');
-      console.error('Erro ao cadastrar comércio:', error);
     }
   });
 });

@@ -2,57 +2,34 @@ import { auth } from './firebase.js';
 import { signInWithEmailAndPassword, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-  const form = document.getElementById('loginForm');
+  const loginForm = document.getElementById('loginForm');
   const errorDiv = document.getElementById('formError');
-  const successDiv = document.getElementById('formSuccess');
 
-  if (!form) {
-    console.warn('Formulário de login não encontrado.');
-    return;
-  }
+  // Redirecionar se já autenticado
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      window.location.href = 'atendimento-cliente.html';
+    }
+  });
 
-  form.addEventListener('submit', async (event) => {
+  // Login
+  loginForm.addEventListener('submit', async (event) => {
     event.preventDefault();
-    event.stopPropagation();
+    errorDiv.classList.add('d-none');
 
-    if (!form.checkValidity()) {
-      form.classList.add('was-validated');
+    if (!loginForm.checkValidity()) {
+      loginForm.classList.add('was-validated');
       return;
     }
 
-    const email = form.querySelector('#email').value.trim();
-    const senha = form.querySelector('#senha').value;
-
-    errorDiv.classList.add('d-none');
-    successDiv.classList.add('d-none');
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
 
     try {
-      await signInWithEmailAndPassword(auth, email, senha);
-      successDiv.textContent = 'Login realizado com sucesso! Redirecionando...';
-      successDiv.classList.remove('d-none');
-
-      // Aguarda a confirmação do estado de autenticação
-      onAuthStateChanged(auth, (user) => {
-        if (user) {
-          setTimeout(() => {
-            window.location.href = 'configuracao-estabelecimento.html';
-          }, 2000);
-        }
-      }, (error) => {
-        errorDiv.textContent = 'Erro ao verificar autenticação.';
-        errorDiv.classList.remove('d-none');
-        console.error('Erro:', error);
-      });
+      await signInWithEmailAndPassword(auth, email, password);
+      window.location.href = 'atendimento-cliente.html';
     } catch (error) {
-      let errorMessage = 'Ocorreu um erro. Tente novamente.';
-      if (error.code === 'auth/user-not-found') {
-        errorMessage = 'Usuário não encontrado.';
-      } else if (error.code === 'auth/wrong-password') {
-        errorMessage = 'Senha incorreta.';
-      } else if (error.code === 'auth/invalid-email') {
-        errorMessage = 'Email inválido.';
-      }
-      errorDiv.textContent = errorMessage;
+      errorDiv.textContent = 'E-mail ou senha inválidos. Tente novamente.';
       errorDiv.classList.remove('d-none');
       console.error('Erro ao fazer login:', error);
     }

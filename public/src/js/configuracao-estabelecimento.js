@@ -1,276 +1,218 @@
-import { auth, db } from './firebase.js';
-import { signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js';
-import { doc, setDoc, getDoc, updateDoc, arrayUnion } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js';
+import { auth, db } from '../js/firebase.js';
+import { onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js';
+import { doc, setDoc, collection, addDoc, getDoc, getDocs, deleteDoc } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js';
 
 document.addEventListener('DOMContentLoaded', () => {
+  const configForm = document.getElementById('configForm');
+  const logoutButton = document.getElementById('logoutButton');
   const errorDiv = document.getElementById('formError');
   const successDiv = document.getElementById('formSuccess');
-  const horariosForm = document.getElementById('horariosForm');
-  const colaboradoresForm = document.getElementById('colaboradoresForm');
-  const servicosForm = document.getElementById('servicosForm');
-  const produtosForm = document.getElementById('produtosForm');
-  const pagamentosForm = document.getElementById('pagamentosForm');
-  const statusForm = document.getElementById('statusForm');
-  const logoutButton = document.getElementById('logoutButton');
+  const nomeComercioElements = document.querySelectorAll('#nomeComercio');
+  const addServicoButton = document.getElementById('addServico');
+  const servicosList = document.getElementById('servicosList');
+
+  if (!configForm || !logoutButton || !errorDiv || !successDiv || nomeComercioElements.length === 0 || !addServicoButton || !servicosList) {
+    console.error('Elementos DOM não encontrados:', {
+      configForm: !!configForm,
+      logoutButton: !!logoutButton,
+      errorDiv: !!errorDiv,
+      successDiv: !!successDiv,
+      nomeComercioElements: nomeComercioElements.length,
+      addServicoButton: !!addServicoButton,
+      servicosList: !!servicosList
+    });
+    return;
+  }
 
   onAuthStateChanged(auth, async (user) => {
     if (!user) {
       errorDiv.textContent = 'Você precisa estar autenticado. Redirecionando...';
       errorDiv.classList.remove('d-none');
-      setTimeout(() => {
-        window.location.href = 'login.html';
-      }, 2000);
+      setTimeout(() => window.location.href = '../pages/login.html', 2000);
       return;
     }
 
     const userId = user.uid;
     const comercioRef = doc(db, 'comercios', userId);
+    const colaboradoresRef = collection(db, 'comercios', userId, 'colaboradores');
+    const servicosRef = collection(db, 'comercios', userId, 'servicos');
+    const produtosRef = collection(db, 'comercios', userId, 'produtos');
+    const formasPagamentoRef = collection(db, 'comercios', userId, 'formasPagamento');
 
-    // Carregar dados existentes
     const loadData = async () => {
       try {
+        console.log('Carregando dados para userId:', userId);
         const docSnap = await getDoc(comercioRef);
+        console.log('Caminho do documento:', comercioRef.path);
         if (docSnap.exists()) {
           const data = docSnap.data();
-          // Horários
-          if (data.horarios) {
-            const horariosList = document.getElementById('horariosList');
-            data.horarios.forEach(horario => {
-              const li = document.createElement('li');
-              li.className = 'list-group-item';
-              li.textContent = `${horario.dia}: ${horario.abertura} - ${horario.fechamento}`;
-              horariosList.appendChild(li);
-            });
-          }
-          // Colaboradores
-          if (data.colaboradores) {
-            const colaboradoresList = document.getElementById('colaboradoresList');
-            data.colaboradores.forEach(colaborador => {
-              const li = document.createElement('li');
-              li.className = 'list-group-item';
-              li.textContent = `${colaborador.nome} (${colaborador.funcao})${colaborador.telefone ? ` - ${colaborador.telefone}` : ''}`;
-              colaboradoresList.appendChild(li);
-            });
-          }
-          // Serviços
-          if (data.servicos) {
-            const servicosList = document.getElementById('servicosList');
-            data.servicos.forEach(servico => {
-              const li = document.createElement('li');
-              li.className = 'list-group-item';
-              li.textContent = `${servico.nome} - R$${servico.preco.toFixed(2)}${servico.duracao ? ` (${servico.duracao} min)` : ''}`;
-              servicosList.appendChild(li);
-            });
-          }
-          // Produtos
-          if (data.produtos) {
-            const produtosList = document.getElementById('produtosList');
-            data.produtos.forEach(produto => {
-              const li = document.createElement('li');
-              li.className = 'list-group-item';
-              li.textContent = `${produto.nome} - R$${produto.preco.toFixed(2)}${produto.estoque ? ` (Estoque: ${produto.estoque})` : ''}`;
-              produtosList.appendChild(li);
-            });
-          }
-          // Formas de Pagamento
-          if (data.formasPagamento) {
-            const pagamentosList = document.getElementById('pagamentosList');
-            data.formasPagamento.forEach(pagamento => {
-              const li = document.createElement('li');
-              li.className = 'list-group-item';
-              li.textContent = pagamento;
-              pagamentosList.appendChild(li);
-            });
-          }
-          // Status
-          if (data.status) {
-            document.getElementById('statusEstabelecimento').value = data.status;
-          }
+          console.log('Dados do comércio:', data);
+          document.getElementById('nomeFantasia').value = data.nomeFantasia || '';
+          document.getElementById('telefoneComercial').value = data.telefoneComercial || '';
+          document.getElementById('email').value = data.email || user.email;
+          document.getElementById('segmento').value = data.segmento || '';
+          document.getElementById('cidade').value = data.cidade || '';
+          document.getElementById('estado').value = data.estado || '';
+          document.getElementById('status').value = data.status || 'Aberto';
+          document.getElementById('logo').value = data.logo || '';
+          nomeComercioElements.forEach(el => {
+            el.textContent = data.nomeFantasia || 'Estabelecimento';
+          });
+          document.getElementById('telefoneComercio').textContent = data.telefoneComercial || 'Não informado';
+          document.getElementById('emailComercio').textContent = data.email || user.email;
+        } else {
+          console.warn('Documento não existe em comercios/', userId);
+          errorDiv.textContent = 'Nenhum dado encontrado. Configure o estabelecimento.';
+          errorDiv.classList.remove('d-none');
+          nomeComercioElements.forEach(el => {
+            el.textContent = 'Estabelecimento';
+          });
+          document.getElementById('telefoneComercio').textContent = 'Não informado';
+          document.getElementById('emailComercio').textContent = user.email || 'Não informado';
         }
+
+        // Carregar serviços
+        servicosList.innerHTML = '';
+        const servicosSnap = await getDocs(servicosRef);
+        servicosSnap.forEach(doc => {
+          const servico = doc.data();
+          const div = document.createElement('div');
+          div.className = 'input-group mb-2';
+          div.innerHTML = `
+            <input type="text" class="form-control" placeholder="Nome do serviço" value="${servico.nome}">
+            <input type="number" class="form-control" placeholder="Preço" value="${servico.preco}">
+            <input type="number" class="form-control" placeholder="Duração (min)" value="${servico.duracao || ''}">
+            <button type="button" class="btn btn-outline-danger remove-servico">Remover</button>
+          `;
+          servicosList.appendChild(div);
+        });
       } catch (error) {
         console.error('Erro ao carregar dados:', error);
-        errorDiv.textContent = 'Erro ao carregar dados do comércio.';
+        errorDiv.textContent = error.code === 'permission-denied'
+          ? 'Permissões insuficientes. Verifique as regras do Firestore.'
+          : 'Erro ao carregar dados do comércio: ' + error.message;
         errorDiv.classList.remove('d-none');
+        nomeComercioElements.forEach(el => {
+          el.textContent = 'Estabelecimento';
+        });
+        document.getElementById('telefoneComercio').textContent = 'Não informado';
+        document.getElementById('emailComercio').textContent = user.email || 'Não informado';
       }
     };
+
     await loadData();
 
-    // Horários
-    horariosForm.addEventListener('submit', async (event) => {
-      event.preventDefault();
-      if (!horariosForm.checkValidity()) {
-        horariosForm.classList.add('was-validated');
-        return;
-      }
-      const dia = document.getElementById('diaSemana').value;
-      const abertura = document.getElementById('horaAbertura').value;
-      const fechamento = document.getElementById('horaFechamento').value;
-      try {
-        await updateDoc(comercioRef, {
-          horarios: arrayUnion({ dia, abertura, fechamento })
-        });
-        const li = document.createElement('li');
-        li.className = 'list-group-item';
-        li.textContent = `${dia}: ${abertura} - ${fechamento}`;
-        document.getElementById('horariosList').appendChild(li);
-        horariosForm.reset();
-        successDiv.textContent = 'Horário adicionado com sucesso!';
-        successDiv.classList.remove('d-none');
-      } catch (error) {
-        errorDiv.textContent = 'Erro ao adicionar horário.';
-        errorDiv.classList.remove('d-none');
-        console.error('Erro:', error);
+    // Adicionar serviço
+    addServicoButton.addEventListener('click', () => {
+      const div = document.createElement('div');
+      div.className = 'input-group mb-2';
+      div.innerHTML = `
+        <input type="text" class="form-control" placeholder="Nome do serviço">
+        <input type="number" class="form-control" placeholder="Preço">
+        <input type="number" class="form-control" placeholder="Duração (min)">
+        <button type="button" class="btn btn-outline-danger remove-servico">Remover</button>
+      `;
+      servicosList.appendChild(div);
+    });
+
+    // Remover serviço
+    servicosList.addEventListener('click', (event) => {
+      if (event.target.classList.contains('remove-servico')) {
+        event.target.parentElement.remove();
       }
     });
 
-    // Colaboradores
-    colaboradoresForm.addEventListener('submit', async (event) => {
+    // Salvar configuração
+    configForm.addEventListener('submit', async (event) => {
       event.preventDefault();
-      if (!colaboradoresForm.checkValidity()) {
-        colaboradoresForm.classList.add('was-validated');
+      errorDiv.classList.add('d-none');
+      successDiv.classList.add('d-none');
+
+      if (!configForm.checkValidity()) {
+        configForm.classList.add('was-validated');
         return;
       }
-      const nome = document.getElementById('nomeColaborador').value.trim();
-      const funcao = document.getElementById('funcaoColaborador').value.trim();
-      const telefone = document.getElementById('telefoneColaborador').value.trim();
+
       try {
-        await updateDoc(comercioRef, {
-          colaboradores: arrayUnion({ nome, funcao, telefone: telefone || null })
-        });
-        const li = document.createElement('li');
-        li.className = 'list-group-item';
-        li.textContent = `${nome} (${funcao})${telefone ? ` - ${telefone}` : ''}`;
-        document.getElementById('colaboradoresList').appendChild(li);
-        colaboradoresForm.reset();
-        successDiv.textContent = 'Colaborador adicionado com sucesso!';
+        // Salvar metadados
+        await setDoc(comercioRef, {
+          nomeFantasia: document.getElementById('nomeFantasia').value.trim(),
+          razaoSocial: null,
+          cnpj: null,
+          email: document.getElementById('email').value.trim() || user.email,
+          emailGestor: document.getElementById('emailGestor').value.trim() || null,
+          telefoneComercial: document.getElementById('telefoneComercial').value.trim() || null,
+          enderecoComercial: null,
+          cidade: document.getElementById('cidade').value.trim(),
+          estado: document.getElementById('estado').value.trim(),
+          segmento: document.getElementById('segmento').value.trim(),
+          status: document.getElementById('status').value,
+          logo: document.getElementById('logo').value.trim() || null,
+          createdAt: new Date().toISOString(),
+          descricao: null
+        }, { merge: true });
+
+        // Salvar serviços
+        await Promise.all((await getDocs(servicosRef)).docs.map(doc => deleteDoc(doc.ref)));
+        const servicosInputs = servicosList.querySelectorAll('.input-group');
+        for (const inputGroup of servicosInputs) {
+          const nome = inputGroup.querySelector('input:nth-child(1)').value.trim();
+          const preco = parseFloat(inputGroup.querySelector('input:nth-child(2)').value);
+          const duracao = parseInt(inputGroup.querySelector('input:nth-child(3)').value) || null;
+          if (nome && preco) {
+            await addDoc(servicosRef, { nome, preco, duracao });
+          }
+        }
+
+        // Salvar colaboradores (estático)
+        await Promise.all((await getDocs(colaboradoresRef)).docs.map(doc => deleteDoc(doc.ref)));
+        const colaboradores = [
+          { nome: "Michael J.", funcao: "Recepção", telefone: "(11) 98765-4654" },
+          { nome: "Elves Sogro Dele", funcao: "Cabeleireiro", telefone: "(11) 78945-6126" }
+        ];
+        for (const colaborador of colaboradores) {
+          await addDoc(colaboradoresRef, colaborador);
+        }
+
+        // Salvar produtos (estático)
+        await Promise.all((await getDocs(produtosRef)).docs.map(doc => deleteDoc(doc.ref)));
+        const produtos = [
+          { nome: "Shampoo", preco: 60, estoque: 3 },
+          { nome: "Condicionador", preco: 78, estoque: 3 }
+        ];
+        for (const produto of produtos) {
+          await addDoc(produtosRef, produto);
+        }
+
+        // Salvar formas de pagamento (estático)
+        await Promise.all((await getDocs(formasPagamentoRef)).docs.map(doc => deleteDoc(doc.ref)));
+        const formasPagamento = ["PIX", "Cartão de Crédito", "Cartão de Débito", "Dinheiro"];
+        for (const forma of formasPagamento) {
+          await addDoc(formasPagamentoRef, { nome: forma });
+        }
+
+        successDiv.textContent = 'Configuração salva com sucesso!';
         successDiv.classList.remove('d-none');
+        await loadData();
       } catch (error) {
-        errorDiv.textContent = 'Erro ao adicionar colaborador.';
+        console.error('Erro ao salvar:', error);
+        errorDiv.textContent = error.code === 'permission-denied'
+          ? 'Permissões insuficientes. Verifique as regras do Firestore.'
+          : 'Erro ao salvar configuração: ' + error.message;
         errorDiv.classList.remove('d-none');
-        console.error('Erro:', error);
       }
     });
 
-    // Serviços
-    servicosForm.addEventListener('submit', async (event) => {
-      event.preventDefault();
-      if (!servicosForm.checkValidity()) {
-        servicosForm.classList.add('was-validated');
-        return;
-      }
-      const nome = document.getElementById('nomeServico').value.trim();
-      const preco = parseFloat(document.getElementById('precoServico').value);
-      const duracao = parseInt(document.getElementById('duracaoServico').value) || null;
-      try {
-        await updateDoc(comercioRef, {
-          servicos: arrayUnion({ nome, preco, duracao })
-        });
-        const li = document.createElement('li');
-        li.className = 'list-group-item';
-        li.textContent = `${nome} - R$${preco.toFixed(2)}${duracao ? ` (${duracao} min)` : ''}`;
-        document.getElementById('servicosList').appendChild(li);
-        servicosForm.reset();
-        successDiv.textContent = 'Serviço adicionado com sucesso!';
-        successDiv.classList.remove('d-none');
-      } catch (error) {
-        errorDiv.textContent = 'Erro ao adicionar serviço.';
-        errorDiv.classList.remove('d-none');
-        console.error('Erro:', error);
-      }
-    });
-
-    // Produtos
-    produtosForm.addEventListener('submit', async (event) => {
-      event.preventDefault();
-      if (!produtosForm.checkValidity()) {
-        produtosForm.classList.add('was-validated');
-        return;
-      }
-      const nome = document.getElementById('nomeProduto').value.trim();
-      const preco = parseFloat(document.getElementById('precoProduto').value);
-      const estoque = parseInt(document.getElementById('estoqueProduto').value) || null;
-      try {
-        await updateDoc(comercioRef, {
-          produtos: arrayUnion({ nome, preco, estoque })
-        });
-        const li = document.createElement('li');
-        li.className = 'list-group-item';
-        li.textContent = `${nome} - R$${preco.toFixed(2)}${estoque ? ` (Estoque: ${estoque})` : ''}`;
-        document.getElementById('produtosList').appendChild(li);
-        produtosForm.reset();
-        successDiv.textContent = 'Produto adicionado com sucesso!';
-        successDiv.classList.remove('d-none');
-      } catch (error) {
-        errorDiv.textContent = 'Erro ao adicionar produto.';
-        errorDiv.classList.remove('d-none');
-        console.error('Erro:', error);
-      }
-    });
-
-    // Formas de Pagamento
-    pagamentosForm.addEventListener('submit', async (event) => {
-      event.preventDefault();
-      const checkboxes = document.querySelectorAll('#pagamentosForm input:checked');
-      if (checkboxes.length === 0) {
-        document.getElementById('pagamentosFeedback').style.display = 'block';
-        return;
-      }
-      const formas = Array.from(checkboxes).map(cb => cb.value);
-      try {
-        await updateDoc(comercioRef, {
-          formasPagamento: formas
-        });
-        const pagamentosList = document.getElementById('pagamentosList');
-        pagamentosList.innerHTML = '';
-        formas.forEach(forma => {
-          const li = document.createElement('li');
-          li.className = 'list-group-item';
-          li.textContent = forma;
-          pagamentosList.appendChild(li);
-        });
-        pagamentosForm.reset();
-        document.getElementById('pagamentosFeedback').style.display = 'none';
-        successDiv.textContent = 'Formas de pagamento salvas com sucesso!';
-        successDiv.classList.remove('d-none');
-      } catch (error) {
-        errorDiv.textContent = 'Erro ao salvar formas de pagamento.';
-        errorDiv.classList.remove('d-none');
-        console.error('Erro:', error);
-      }
-    });
-
-    // Status
-    statusForm.addEventListener('submit', async (event) => {
-      event.preventDefault();
-      if (!statusForm.checkValidity()) {
-        statusForm.classList.add('was-validated');
-        return;
-      }
-      const status = document.getElementById('statusEstabelecimento').value;
-      try {
-        await updateDoc(comercioRef, { status });
-        successDiv.textContent = 'Status atualizado com sucesso!';
-        successDiv.classList.remove('d-none');
-      } catch (error) {
-        errorDiv.textContent = 'Erro ao atualizar status.';
-        errorDiv.classList.remove('d-none');
-        console.error('Erro:', error);
-      }
-    });
-
-    // Logout
     logoutButton.addEventListener('click', async () => {
       try {
         await signOut(auth);
-        successDiv.textContent = 'Logout realizado com sucesso! Redirecionando...';
+        successDiv.textContent = 'Logout realizado com sucesso!';
         successDiv.classList.remove('d-none');
-        setTimeout(() => {
-          window.location.href = 'login.html';
-        }, 2000);
+        setTimeout(() => window.location.href = '../pages/login.html', 2000);
       } catch (error) {
-        errorDiv.textContent = 'Erro ao sair. Tente novamente.';
-        errorDiv.classList.remove('d-none');
         console.error('Erro ao fazer logout:', error);
+        errorDiv.textContent = 'Erro ao sair: ' + error.message;
+        errorDiv.classList.remove('d-none');
       }
     });
   });
