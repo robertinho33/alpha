@@ -1,0 +1,101 @@
+/* style.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.d-none {
+  display: none;
+}
+
+/* Estilos do layout */
+body {
+  @apply flex flex-col min-h-screen;
+}
+
+header {
+  @apply bg-primary text-white p-3;
+}
+
+main {
+  @apply flex-1 p-4 md:ml-56 md:mr-56; /* Margens para sidebar (esquerda) e banners (direita) */
+}
+
+footer {
+  @apply bg-dark text-white p-4 text-center;
+}
+
+#sidebar {
+  @apply bg-dark text-white w-56 fixed top-0 left-0 h-full p-3 transition-transform transform md:transform-none z-50;
+}
+
+#sidebar.hidden {
+  @apply -translate-x-full;
+}
+
+#banner-aside {
+  @apply w-56 fixed top-0 right-0 h-full p-3 bg-light flex flex-col items-center z-40 d-none md:flex; /* Banners à direita */
+  overflow: hidden; /* Esconder banners fora da área visível */
+}
+
+nav ul.navbar-nav li.nav-item {
+  @apply py-1;
+}
+
+nav ul.navbar-nav li.nav-item a.nav-link {
+  @apply text-white hover:text-primary flex items-center text-sm;
+}
+
+svg {
+  @apply mr-1 w-4 h-4;
+}
+
+/* Estilos do carrossel de banners */
+.carousel-container {
+  @apply flex flex-col items-center;
+  height: 360px; /* 3 cards de ~120px (100px imagem + padding/margem) */
+  transition: transform 0.5s ease-in-out; /* Animação suave */
+}
+
+.banner-ad {
+  @apply mb-3 mx-auto; /* Margem entre cards */
+}
+
+.banner-ad .card {
+  @apply text-center border-0 rounded;
+  width: 120px; /* Tamanho fixo para o card */
+  height: 120px; /* Ajustado para imagem de 100px + padding */
+}
+
+.banner-ad .card img {
+  @apply mx-auto rounded; /* Centralizar imagem no card */
+  width: 100px;
+  height: 100px;
+  object-fit: contain; /* Evitar distorção */
+}
+
+/* Ajustes para o header */
+.header-content {
+  @apply flex flex-col md:flex-row items-center justify-between;
+}
+
+.header-logo {
+  @apply flex items-center;
+}
+
+.header-logo img {
+  @apply h-8 md:h-10; /* Tamanhos dos logos */
+}
+
+.header-contact {
+  @apply text-sm mt-2 md:mt-0;
+}
+
+/* Ajustes para compatibilidade com Bootstrap */
+.btn {
+  @apply transition-colors duration-200;
+}
+
+.form-control {
+  @apply border-gray-300 focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50;
+}
+.im

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Cadastrar Produto - Admin</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Cadastro de Produto</h1>
+    <nav>
+      <a href="index.html">Início</a>
+    </nav>
+  </header>
+
+  <main>
+    <form id="product-form">
+      <input type="text" id="name" placeholder="Nome do produto" required>
+      <textarea id="description" placeholder="Descrição do produto" required></textarea>
+      <input type="number" id="price" placeholder="Preço" required>
+      <input type="text" id="imageURL" placeholder="URL da imagem" required>
+      <input type="number" id="stockQuantity" placeholder="Quantidade em estoque" required>
+      <button type="submit">Cadastrar Produto</button>
+    </form>
+  </main>
+
+  <script type="module">
+    import { addProduct } from './src/db/products.js';
+
+    const form = document.getElementById('product-form');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const product = {
+        name: document.getElementById('name').value,
+        description: document.getElementById('description').value,
+        price: parseFloat(document.getElementById('price').value),
+        imageURL: document.getElementById('imageURL').value,
+        stockQuantity: parseInt(document.getElementById('stockQuantity').value)
+      };
+
+      await addProduct(product);
+
+      form.reset();
+      alert('Produto cadastrado com sucesso!');
+    });
+  </script>
+</body>
+</html>

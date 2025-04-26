@@ -1,15 +1,9 @@
 {
-  "name": "alpfa",
-  "version": "1.0.0",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "dependencies": {
-    "firebase": "^11.6.0"
+    "chart.js": "^4.4.9",
+    "firebase": "^11.6.1"
+  },
+  "devDependencies": {
+    "tailwindcss": "^4.1.4"
   }
 }
