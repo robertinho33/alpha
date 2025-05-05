@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seu Salão de Beleza - Cadastre seu Salão!</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="src/style.css">
+</head>
+<body>
+  
+    <header class="bg-light py-3">
+        <div class="container">
+            <div class="d-flex align-items-center justify-content-between">
+                <div class="logo d-flex align-items-center">
+                    <img src="src/images/shop-with.png" alt="Logo do Seu Salão" class="img-fluid me-2" style="max-height: 50px;">
+                    <h1 class="m-0">Seu Salão de Beleza</h1>
+                </div>
+                <nav class="d-none d-md-block">
+                    <ul class="nav">
+                        <li class="nav-item"><a class="nav-link" href="index.html">Início</a></li>
+                        <li class="nav-item"><a class="nav-link" href="cadastro-salao.html">Cadastro de Salão</a></li>
+                        <li class="nav-item"><a class="nav-link" href="cadastro-cliente.html">Cadastro de Cliente</a></li>
+                        <li class="nav-item"><a class="nav-link" href="cadastro-funcionario.html">Cadastro de Funcionário</a></li>
+                        <li class="nav-item"><a class="nav-link active" href="cadastro-servico.html">Cadastro de Serviço</a></li>
+                        <li class="nav-item"><a class="nav-link" href="Shopping-do-meu-bairro.html">Produtos</a></li>
+                        <li class="nav-item"><a class="nav-link" href="servicos.html">Serviços</a></li>
+                        <li class="nav-item"><a class="nav-link" href="contato.html">Contato</a></li>
+                        <li class="nav-item"><a class="nav-link" href="login.html">Login</a></li>
+                    </ul>
+                </nav>
+                <div class="d-md-none">
+                    <button class="btn btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Início</a></li>
+                    <li class="nav-item"><a class="nav-link" href="cadastro-salao.html">Cadastro de Salão</a></li>
+                    <li class="nav-item"><a class="nav-link" href="cadastro-cliente.html">Cadastro de Cliente</a></li>
+                    <li class="nav-item"><a class="nav-link" href="cadastro-funcionario.html">Cadastro de Funcionário</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="cadastro-servico.html">Cadastro de Serviço</a></li>
+                    <li class="nav-item"><a class="nav-link" href="Shopping-do-meu-bairro.html">Produtos</a></li>
+                    <li class="nav-item"><a class="nav-link" href="servicos.html">Serviços</a></li>
+                    <li class="nav-item"><a class="nav-link" href="contato.html">Contato</a></li>
+                    <li class="nav-item"><a class="nav-link" href="login.html">Login</a></li>
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mt-5">
+        <section class="cadastro-servico-form">
+            <h2 class="text-center mb-4">Cadastrar Novo Serviço</h2>
+            <div class="row justify-content-center">
+                <div class="col-md-8 col-lg-6">
+                    <form id="seuFormularioDeCadastroDeServico" class="needs-validation" novalidate>
+                        <div class="mb-3">
+                            <label for="nomeServico" class="form-label">Nome do Serviço</label>
+                            <input type="text" class="form-control" id="nomeServico" placeholder="Ex: Corte Simples, Coloração Completa, Manicure" required>
+                            <div class="invalid-feedback">Por favor, insira o nome do serviço.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="categoriaServico" class="form-label">Categoria do Serviço</label>
+                            <select class="form-select" id="categoriaServico" required>
+                                <option value="" selected>Selecione a categoria</option>
+                                <option value="cabeleireiro">Cabeleireiro</option>
+                                <option value="manicure_pedicure">Manicure e Pedicure</option>
+                                <option value="maquiagem">Maquiagem</option>
+                                <option value="depilacao">Depilação</option>
+                                <option value="outros">Outros</option>
+                            </select>
+                            <div class="invalid-feedback">Por favor, selecione a categoria.</div>
+                        </div>
+                        <div class="mb-3" id="opcoesCabeleireiro" style="display: none;">
+                            <label for="tipoCabeleireiro" class="form-label">Tipo de Serviço de Cabeleireiro</label>
+                            <select class="form-select" id="tipoCabeleireiro">
+                                <option value="" selected>Selecione o tipo</option>
+                                <option value="corte_feminino">Corte Feminino</option>
+                                <option value="corte_masculino">Corte Masculino</option>
+                                <option value="corte_infantil">Corte Infantil</option>
+                                <option value="coloracao">Coloração</option>
+                                <option value="alisamento">Alisamento</option>
+                                <option value="permanente">Permanente</option>
+                                <option value="hidratacao">Hidratação</option>
+                                <option value="reconstrucao">Reconstrução</option>
+                                <option value="penteado">Penteado</option>
+                                <option value="escova">Escova</option>
+                                <option value="outro_cabeleireiro">Outro</option>
+                            </select>
+                        </div>
+                        <div class="mb-3" id="opcoesManicurePedicure" style="display: none;">
+                            <label for="tipoManicurePedicure" class="form-label">Tipo de Serviço de Manicure/Pedicure</label>
+                            <select class="form-select" id="tipoManicurePedicure">
+                                <option value="" selected>Selecione o tipo</option>
+                                <option value="manicure_simples">Manicure Simples</option>
+                                <option value="manicure_completa">Manicure Completa</option>
+                                <option value="pedicure_simples">Pedicure Simples</option>
+                                <option value="pedicure_completa">Pedicure Completa</option>
+                                <option value="unhas_gel">Unhas em Gel</option>
+                                <option value="unhas_acrilico">Unhas em Acrílico</option>
+                                <option value="esfoliacao_hidratacao">Esfoliação e Hidratação</option>
+                                <option value="decoracao_unhas">Decoração de Unhas</option>
+                                <option value="outro_manicure_pedicure">Outro</option>
+                            </select>
+                        </div>
+                        <div class="mb-3" id="opcoesMaquiagem" style="display: none;">
+                            <label for="tipoMaquiagem" class="form-label">Tipo de Serviço de Maquiagem</label>
+                            <select class="form-select" id="tipoMaquiagem">
+                                <option value="" selected>Selecione o tipo</option>
+                                <option value="maquiagem_dia">Maquiagem para o Dia</option>
+                                <option value="maquiagem_noite">Maquiagem para a Noite</option>
+                                <option value="maquiagem_festa">Maquiagem para Festa/Evento</option>
+                                <option value="maquiagem_noiva">Maquiagem para Noiva</option>
+                                <option value="design_sobrancelhas">Design de Sobrancelhas</option>
+                                <option value="micropigmentacao">Micropigmentação</option>
+                                <option value="extensao_cilios">Extensão de Cílios</option>
+                                <option value="outro_maquiagem">Outro</option>
+                            </select>
+                        </div>
+                        <div class="mb-3" id="opcoesDepilacao" style="display: none;">
+                            <label for="tipoDepilacao" class="form-label">Tipo de Serviço de Depilação</label>
+                            <select class="form-select" id="tipoDepilacao">
+                                <option value="" selected>Selecione a área</option>
+                                <option value="depilacao_perna">Perna</option>
+                                <option value="depilacao_virilha">Virilha</option>
+                                <option value="depilacao_axila">Axila</option>
+                                <option value="depilacao_braco">Braço</option>
+                                <option value="depilacao_buco">Buço</option>
+                                <option value="depilacao_sobrancelha">Sobrancelha (Pinça/Cera)</option>
+                                <option value="depilacao_corpo_completa">Corpo Completa</option>
+                                <option value="outro_depilacao">Outro</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="precoServico" class="form-label">Preço do Serviço (R$)</label>
+                            <input type="number" class="form-control" id="precoServico" placeholder="Digite o preço" min="0" step="0.01" required>
+                            <div class="invalid-feedback">Por favor, insira um preço válido.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="duracaoServico" class="form-label">Duração Aproximada (minutos)</label>
+                            <input type="number" class="form-control" id="duracaoServico" placeholder="Tempo em minutos" min="1" required>
+                            <div class="invalid-feedback">Por favor, insira a duração em minutos.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="descricaoServico" class="form-label">Descrição do Serviço (opcional)</label>
+                            <textarea class="form-control" id="descricaoServico" rows="3" placeholder="Detalhes sobre o serviço"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Cadastrar Serviço</button>
+                        <div id="formSuccess" class="d-none text-success mt-3"></div>
+                        <div id="formError" class="d-none text-danger mt-3"></div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-dark text-light py-3 text-center">
+        <div class="container">
+            <p>© 2025 Seu Salão de Beleza. Todos os direitos reservados.</p>
+            <div class="social-links mt-2">
+                <a href="#" class="btn btn-outline-light btn-sm me-2"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="btn btn-outline-light btn-sm me-2"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+    </footer>
+ 
+    <script>
+        document.getElementById('categoriaServico').addEventListener('change', function() {
+            var opcoesCabeleireiro = document.getElementById('opcoesCabeleireiro');
+            if (this.value === 'cabeleireiro') {
+                opcoesCabeleireiro.style.display = 'block';
+            } else {
+                opcoesCabeleireiro.style.display = 'none';
+            }
+        });
+        
+    document.getElementById('categoriaServico').addEventListener('change', function() {
+        var opcoesCabeleireiro = document.getElementById('opcoesCabeleireiro');
+        var opcoesManicurePedicure = document.getElementById('opcoesManicurePedicure');
+        var opcoesMaquiagem = document.getElementById('opcoesMaquiagem');
+        var opcoesDepilacao = document.getElementById('opcoesDepilacao');
+
+        opcoesCabeleireiro.style.display = (this.value === 'cabeleireiro') ? 'block' : 'none';
+        opcoesManicurePedicure.style.display = (this.value === 'manicure_pedicure') ? 'block' : 'none';
+        opcoesMaquiagem.style.display = (this.value === 'maquiagem') ? 'block' : 'none';
+        opcoesDepilacao.style.display = (this.value === 'depilacao') ? 'block' : 'none';
+    });
+    </script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>
