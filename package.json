@@ -1,9 +1,0 @@
-{
-  "dependencies": {
-    "chart.js": "^4.4.9",
-    "firebase": "^11.6.1"
-  },
-  "devDependencies": {
-    "tailwindcss": "^4.1.4"
-  }
-}
