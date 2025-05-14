@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Visual Beauty - Clientes</title>
+    <script defer src="js/loadMenu.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+   
+     <!-- Container para o menu -->
+     <div id="menu-container"></div>
+ <h1>Clientes</h1>
+     <!-- Conteúdo Principal -->
+     <main class="main-content" id="app">
+         <!-- Conteúdo será carregado aqui -->
+          <!-- Inclua dentro da sua seção de serviços -->
+<section class="form-container">
+    <h2>Cadastro de Serviços</h2>
+    <form id="servico-form" class="styled-form">
+        <div class="form-group">
+            <label for="nome-servico">Nome do Serviço*</label>
+            <input type="text" id="nome-servico" name="nome-servico" required 
+                   placeholder="Ex: Corte feminino" minlength="3" maxlength="50">
+            <span class="error-message"></span>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="categoria">Categoria*</label>
+                <select id="categoria" name="categoria" required>
+                    <option value="">Selecione...</option>
+                    <option value="cabelo">Cabelo</option>
+                    <option value="unhas">Unhas</option>
+                    <option value="pele">Tratamentos Faciais</option>
+                    <option value="depilacao">Depilação</option>
+                    <option value="maquiagem">Maquiagem</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="duracao">Duração (minutos)*</label>
+                <input type="number" id="duracao" name="duracao" required 
+                       min="15" max="240" step="5" value="30">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="valor">Valor (R$)*</label>
+                <input type="number" id="valor" name="valor" required 
+                       min="0" step="0.01" placeholder="0,00">
+            </div>
+
+            <div class="form-group">
+                <label for="comissao">Comissão (%)*</label>
+                <input type="number" id="comissao" name="comissao" required 
+                       min="0" max="100" step="1" value="30">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="descricao">Descrição Detalhada</label>
+            <textarea id="descricao" name="descricao" rows="4"
+                      placeholder="Descreva os materiais utilizados e procedimentos..."></textarea>
+        </div>
+
+        <div class="form-group checkbox-group">
+            <label>
+                <input type="checkbox" name="requer-agendamento"> Requer agendamento prévio?
+            </label>
+            <label>
+                <input type="checkbox" name="ativo"> Serviço ativo no sistema
+            </label>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-primary">
+                <i class="fas fa-save"></i> Cadastrar Serviço
+            </button>
+            <button type="reset" class="btn-secondary">
+                <i class="fas fa-eraser"></i> Limpar
+            </button>
+        </div>
+    </form>
+</section>
+     </main>
+ 
+     <!-- Footer -->
+     <div id="footer-container"></div>
+ 
+     <!-- Scripts no final do body -->
+     <script type="module" src="js/router.js"></script>
+     <script src="js/loadMenu.js"></script>
+ </body>
+ </html>
