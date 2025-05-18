@@ -1,0 +1,94 @@
+/* Estilos globais para inputs */
+input, textarea {
+  background-color: #FFFFFF; /* Branco */
+  color: #1F2937; /* Cinza escuro para texto digitado */
+  border: 1px solid #D1D5DB; /* Cinza claro */
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  width: 100%;
+  outline: none;
+}
+
+input:focus, textarea:focus {
+  ring: 2px solid #FBBF24; /* Amarelo no foco */
+  border-color: #FBBF24;
+}
+
+input::placeholder, textarea::placeholder {
+  color: #6B7280; /* Cinza médio */
+  opacity: 1;
+}
+
+textarea {
+  resize: none;
+}
+
+/* Espaçamento para formulários */
+.space-y-4 > * + * {
+  margin-top: 1rem;
+}
+
+/* Checkbox */
+input[type="checkbox"] {
+  accent-color: #FBBF24; /* Amarelo para checkbox */
+}
+
+/* Mensagens de erro e sucesso */
+.text-red-500 {
+  color: #EF4444;
+}
+.text-green-500 {
+  color: #10B981;
+}
+
+/* Estilos para tabela */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 0.75rem;
+  text-align: left;
+}
+
+thead tr {
+  background-color: #1E3A8A; /* Azul escuro */
+  color: #FFFFFF;
+}
+
+tbody tr:nth-child(even) {
+  background-color: #F9FAFB; /* Cinza claro */
+}
+
+tbody tr:hover {
+  background-color: #E5E7EB; /* Cinza hover */
+}
+
+/* Botões na tabela */
+.edit-btn, .delete-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+}
+
+.edit-btn {
+  background-color: #3B82F6; /* Azul */
+}
+
+.edit-btn:hover {
+  background-color: #2563EB;
+}
+
+.delete-btn {
+  background-color: #EF4444; /* Vermelho */
+}
+
+.delete-btn:hover {
+  background-color: #DC2626;
+}
+
+/* Modal */
+#edit-modal {
+  transition: opacity 0.3s ease;
+}
