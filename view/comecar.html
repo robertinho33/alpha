@@ -1,145 +1,118 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Comece a vender no Seu Shopping Online do Bairro em 3 passos simples">
-    <title>Como Começar - Seu Shopping Online do Bairro</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="/css/styles.css">
-    <script type="module" src="/js/data/main.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Cadastre-se ou faça login no Seu Shopping Online do Bairro">
+  <title>Como Começar - Seu Shopping Online do Bairro</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="/css/styles.css">
+  <script type="module" src="/js/data/adminSignup.js"></script>
+  <!-- <script type="module" src="/js/data/main.js"></script> -->
 </head>
 <body class="font-poppins">
-    <header class="bg-white shadow-md sticky top-0 z-50">
-        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-            <a href="/index.html" class="text-2xl font-bold text-blue-900">Seu Shopping Online</a>
-            <nav class="hidden md:flex space-x-6">
-                <a href="/index.html" class="text-gray-700 hover:text-yellow-500">Home</a>
-                <a href="/view/sobre.html" class="text-gray-700 hover:text-yellow-500">Sobre</a>
-                <a href="/view/beneficios.html" class="text-gray-700 hover:text-yellow-500">Benefícios</a>
-                <a href="/view/comecar.html" class="text-gray-700 hover:text-yellow-500">Como Começar</a>
-                <a href="/view/faq.html" class="text-gray-700 hover:text-yellow-500">FAQ</a>
-                <a href="/view/contato.html" class="text-gray-700 hover:text-yellow-500">Contato</a>
-            </nav>
-            <button class="md:hidden text-gray-700 focus:outline-none">
-                <i class="fas fa-bars text-2xl"></i>
-            </button>
-        </div>
-    </header>
+  <!-- Header -->
+  <header class="bg-white shadow-md sticky top-0 z-50">
+    <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+      <a href="/index.html" class="text-2xl font-bold text-blue-900">Seu Shopping Online</a>
+      <nav class="hidden md:flex space-x-6">
+        <a href="/index.html" class="text-gray-700 hover:text-yellow-500">Home</a>
+        <a href="/view/sobre.html" class="text-gray-700 hover:text-yellow-500">Sobre</a>
+        <a href="/view/beneficios.html" class="text-gray-700 hover:text-yellow-500">Benefícios</a>
+        <a href="/view/comecar.html" class="text-gray-700 hover:text-yellow-500">Como Começar</a>
+        <a href="/view/faq.html" class="text-gray-700 hover:text-yellow-500">FAQ</a>
+        <a href="/view/CONTATO.html" class="text-gray-700 hover:text-yellow-500">Contato</a>
+      </nav>
+      <button class="md:hidden text-gray-700 focus:outline-none">
+        <i class="fas fa-bars text-2xl"></i>
+      </button>
+    </div>
+  </header>
 
-    <section class="bg-gray-100 py-12">
-        <div class="container mx-auto px-4">
-            <h1 class="text-4xl font-bold text-center text-blue-900 mb-8">Área do Administrador</h1>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-                <!-- Cadastro de Admin -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h2 class="text-2xl font-semibold text-blue-900 mb-4">Cadastrar Administrador</h2>
-                    <form id="admin-signup-form" class="space-y-4">
-                        <input type="text" name="admin_nome" placeholder="Nome Completo" required
-                            class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500">
-                        <input type="email" name="admin_email" placeholder="E-mail" required
-                            class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500">
-                        <input type="password" name="admin_senha" placeholder="Senha" required
-                            class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500">
-                        <label class="flex items-center">
-                            <input type="checkbox" name="concordo" required class="mr-2">
-                            <span>Concordo com a <a href="/view/politica.html" class="text-blue-900 underline">Política de Privacidade</a></span>
-                        </label>
-                        <button type="submit"
-                            class="w-full bg-blue-500 text-white py-3 rounded-lg text-lg font-semibold hover:bg-blue-600 transition">Cadastrar
-                            Administrador</button>
-                        <div id="admin-signup-error" class="text-red-500 text-sm"></div>
-                        <div id="admin-signup-success" class="text-green-500 text-sm"></div>
-                    </form>
-                </div>
-                <!-- Login de Admin -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h2 class="text-2xl font-semibold text-blue-900 mb-4">Login de Administrador</h2>
-                    <form id="admin-login-form" class="space-y-4">
-                        <input type="email" name="admin_email" placeholder="E-mail" required
-                            class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500">
-                        <input type="password" name="admin_senha" placeholder="Senha" required
-                            class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500">
-                        <button type="submit"
-                            class="w-full bg-blue-900 text-white py-3 rounded-lg text-lg font-semibold hover:bg-blue-800 transition">Entrar</button>
-                        <div id="admin-login-error" class="text-red-500 text-sm"></div>
-                        <div id="admin-login-success" class="text-green-500 text-sm"></div>
-                    </form>
-                </div>
-            </div>
+  <!-- Como Começar Section -->
+  <section class="bg-gray-100 py-12">
+    <div class="container mx-auto px-4">
+      <h1 class="text-4xl font-bold text-center text-blue-900 mb-8">Como Começar</h1>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        <!-- Cadastro Admin -->
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h2 class="text-2xl font-semibold text-blue-900 mb-4">Cadastro de Administrador</h2>
+          <form id="admin-signup-form" class="space-y-4">
+            <input type="text" name="nome" placeholder="Nome Completo" required
+              class="w-full p-3 bg-white text-gray-800 placeholder-gray-500 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500">
+            <input type="email" name="email" placeholder="E-mail" required
+              class="w-full p-3 bg-white text-gray-800 placeholder-gray-500 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500">
+            <input type="password" name="senha" placeholder="Senha" required
+              class="w-full p-3 bg-white text-gray-800 placeholder-gray-500 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500">
+            <label class="flex flex-wrap items-start gap-2">
+              <input type="checkbox" name="concordo" required class="mt-1 w-4 h-4">
+              <span class="text-sm text-gray-700">Concordo com a <a href="/view/politica.html" class="text-blue-900 underline">Política de Privacidade</a></span>
+            </label>
+            <button type="submit" class="w-full bg-blue-500 text-white py-3 rounded-lg text-lg font-semibold hover:bg-blue-600 transition">Cadastrar</button>
+            <div id="admin-signup-error" class="text-red-500 text-sm"></div>
+            <div id="admin-signup-success" class="text-green-500 text-sm"></div>
+          </form>
+          <p class="mt-4 text-center">Já tem conta? <a href="#" id="show-login" class="text-blue-900 underline" aria-label="Mostrar formulário de login">Faça login</a></p>
         </div>
-    </section>
+        <!-- Login Admin -->
+        <div class="bg-white p-6 rounded-lg shadow-md hidden" id="login-form-container">
+          <h2 class="text-2xl font-semibold text-blue-900 mb-4">Login de Administrador</h2>
+          <form id="admin-login-form" class="space-y-4">
+            <input type="email" name="email" placeholder="E-mail" required
+              class="w-full p-3 bg-white text-gray-800 placeholder-gray-500 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500">
+            <input type="password" name="senha" placeholder="Senha" required
+              class="w-full p-3 bg-white text-gray-800 placeholder-gray-500 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500">
+            <button type="submit" class="w-full bg-blue-500 text-white py-3 rounded-lg text-lg font-semibold hover:bg-blue-600 transition">Entrar</button>
+            <div id="admin-login-error" class="text-red-500 text-sm"></div>
+            <div id="admin-login-success" class="text-green-500 text-sm"></div>
+          </form>
+          <p class="mt-4 text-center">Não tem conta? <a href="#" id="show-signup" class="text-blue-900 underline" aria-label="Mostrar formulário de cadastro">Cadastre-se</a></p>
+        </div>
+        <!-- Cadastro Loja -->
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h2 class="text-2xl font-semibold text-blue-900 mb-4">Cadastro de Loja</h2>
+          <form id="store-signup-form" class="space-y-4">
+            <input type="text" name="nome" placeholder="Nome da Loja" required
+              class="w-full p-3 bg-white text-gray-800 placeholder-gray-500 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500">
+            <input type="email" name="email" placeholder="E-mail da Loja" required
+              class="w-full p-3 bg-white text-gray-800 placeholder-gray-500 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500">
+            <input type="password" name="senha" placeholder="Senha" required
+              class="w-full p-3 bg-white text-gray-800 placeholder-gray-500 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500">
+            <input type="tel" name="telefone" placeholder="Telefone da Loja" required
+              class="w-full p-3 bg-white text-gray-800 placeholder-gray-500 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500">
+            <input type="text" name="negocio" placeholder="Tipo de Negócio (ex.: Padaria)" required
+              class="w-full p-3 bg-white text-gray-800 placeholder-gray-500 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500">
+            <input type="text" name="bairro" placeholder="Bairro da Loja" required
+              class="w-full p-3 bg-white text-gray-800 placeholder-gray-500 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500">
+            <label class="flex flex-wrap items-start gap-2">
+              <input type="checkbox" name="concordo" required class="mt-1 w-4 h-4">
+              <span class="text-sm text-gray-700">Concordo com a <a href="/view/politica.html" class="text-blue-900 underline">Política de Privacidade</a></span>
+            </label>
+            <button type="submit" class="w-full bg-blue-500 text-white py-3 rounded-lg text-lg font-semibold hover:bg-blue-600 transition">Cadastrar Loja</button>
+            <div id="store-signup-error" class="text-red-500 text-sm" aria-live="polite"></div>
+            <div id="store-signup-success" class="text-green-500 text-sm" aria-live="polite"></div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
 
-    <section id="store-signup-section" class="bg-gray-100 py-12 hidden">
-        <div class="container mx-auto px-4">
-            <h1 class="text-4xl font-bold text-center text-blue-900 mb-8">Cadastre sua Loja</h1>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div>
-                    <div class="flex items-center mb-6">
-                        <i class="fas fa-file-alt text-4xl text-yellow-500 mr-4"></i>
-                        <div>
-                            <h2 class="text-xl font-semibold">1. Preencha o Formulário</h2>
-                            <p class="text-gray-700">Conte-nos sobre sua loja em poucos minutos.</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center mb-6">
-                        <i class="fas fa-store text-4xl text-yellow-500 mr-4"></i>
-                        <div>
-                            <h2 class="text-xl font-semibold">2. Configure sua Loja</h2>
-                            <p class="text-gray-700">Crie sua vitrine digital e adicione seus produtos.</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center">
-                        <i class="fas fa-shopping-cart text-4xl text-yellow-500 mr-4"></i>
-                        <div>
-                            <h2 class="text-xl font-semibold">3. Comece a Vender</h2>
-                            <p class="text-gray-700">Alcance clientes do bairro e aumente suas vendas!</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h2 class="text-2xl font-semibold text-blue-900 mb-4">Dados da Loja</h2>
-                    <form id="store-signup-form" class="space-y-4">
-                        <input type="text" name="nome" placeholder="Nome da Loja" required
-                            class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500">
-                        <input type="email" name="email" placeholder="E-mail da Loja" required
-                            class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500">
-                        <input type="tel" name="telefone" placeholder="Telefone da Loja" required
-                            class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500">
-                        <input type="text" name="negocio" placeholder="Tipo de Negócio (ex.: Padaria)" required
-                            class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500">
-                        <input type="text" name="bairro" placeholder="Bairro da Loja" required
-                            class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500">
-                        <label class="flex items-center">
-                            <input type="checkbox" name="concordo" required class="mr-2">
-                            <span>Concordo com a <a href="/view/politica.html" class="text-blue-900 underline">Política de Privacidade</a></span>
-                        </label>
-                        <button type="submit"
-                            class="w-full bg-yellow-500 text-white py-3 rounded-lg text-lg font-semibold hover:bg-yellow-600 transition">Cadastrar
-                            Loja</button>
-                        <div id="store-signup-error" class="text-red-500 text-sm"></div>
-                        <div id="store-signup-success" class="text-green-500 text-sm"></div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <footer class="bg-blue-900 text-white py-6">
-        <div class="container mx-auto px-4 text-center">
-            <div class="flex justify-center space-x-4 mb-4">
-                <a href="#" class="text-white hover:text-yellow-500"><i class="fab fa-instagram text-xl"></i></a>
-                <a href="#" class="text-white hover:text-yellow-500"><i class="fab fa-whatsapp text-xl"></i></a>
-            </div>
-            <div class="flex justify-center space-x-4 mb-4">
-                <a href="/view/politica.html" class="text-white hover:text-yellow-500">Política de Privacidade</a>
-                <a href="/view/termos.html" class="text-white hover:text-yellow-500">Termos de Uso</a>
-                <a href="/view/contato.html" class="text-white hover:text-yellow-500">Contato</a>
-            </div>
-            <p>© 2025 Seu Shopping Online do Bairro. Todos os direitos reservados.</p>
-        </div>
-    </footer>
+  <!-- Footer -->
+  <footer class="bg-blue-900 text-white py-6">
+    <div class="container mx-auto px-4 text-center">
+      <div class="flex justify-center space-x-4 mb-4">
+        <a href="#" class="text-white hover:text-yellow-500"><i class="fab fa-instagram text-xl"></i></a>
+        <a href="#" class="text-white hover:text-yellow-500"><i class="fab fa-whatsapp text-xl"></i></a>
+      </div>
+      <div class="flex justify-center space-x-4 mb-4">
+        <a href="/view/politica.html" class="text-white hover:text-yellow-500">Política de Privacidade</a>
+        <a href="/view/termos.html" class="text-white hover:text-yellow-500">Termos de Uso</a>
+        <a href="/view/CONTATO.html" class="text-white hover:text-yellow-500">Contato</a>
+      </div>
+      <p>© 2025 Seu Shopping Online do Bairro. Todos os direitos reservados.</p>
+    </div>
+  </footer>
 </body>
 </html>
