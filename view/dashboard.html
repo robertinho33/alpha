@@ -9,7 +9,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link rel="stylesheet" href="/css/styles.css">
-  <script type="module" src="/js/data/main.js"></script>
+  <script type="module" src="/js/data/dashboard.js"></script>
 </head>
 <body class="font-poppins">
   <!-- Header -->
@@ -40,8 +40,41 @@
         Faça login para acessar o dashboard.
       </div>
       <div id="no-stores-message" class="hidden bg-blue-100 text-blue-800 p-4 rounded-lg mb-6 text-center">
-        Nenhuma loja cadastrada. <a href="/view/comecar.html" class="text-blue-900 underline">Cadastre uma loja agora!</a>
+        Nenhuma loja cadastrada. Cadastre uma loja agora!
       </div>
+
+      <!-- Botão Toggle para Cadastro de Loja -->
+      <div class="flex justify-center mb-6">
+        <button id="toggle-store-form" class="bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-600 transition" aria-label="Mostrar formulário de cadastro de loja">
+          Cadastrar Nova Loja
+        </button>
+      </div>
+
+      <!-- Formulário de Cadastro de Loja (inicialmente escondido) -->
+      <div id="store-form-container" class="hidden bg-white p-6 rounded-lg shadow-md max-w-2xl mx-auto mb-6">
+        <h2 class="text-2xl font-semibold text-blue-900 mb-4">Cadastrar Nova Loja</h2>
+        <form id="store-signup-form" class="space-y-4">
+          <input type="text" name="nome" placeholder="Nome da Loja" required
+            class="w-full p-3 bg-white text-gray-800 placeholder-gray-500 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500">
+          <input type="email" name="email" placeholder="E-mail da Loja" required
+            class="w-full p-3 bg-white text-gray-800 placeholder-gray-500 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500">
+          <input type="tel" name="telefone" placeholder="Telefone da Loja" required
+            class="w-full p-3 bg-white text-gray-800 placeholder-gray-500 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500">
+          <input type="text" name="negocio" placeholder="Tipo de Negócio (ex.: Padaria)" required
+            class="w-full p-3 bg-white text-gray-800 placeholder-gray-500 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500">
+          <input type="text" name="bairro" placeholder="Bairro da Loja" required
+            class="w-full p-3 bg-white text-gray-800 placeholder-gray-500 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500">
+          <label class="flex flex-wrap items-start gap-2">
+            <input type="checkbox" name="concordo" required class="mt-1 w-4 h-4">
+            <span class="text-sm text-gray-700">Concordo com a <a href="/view/politica.html" class="text-blue-900 underline">Política de Privacidade</a></span>
+          </label>
+          <button type="submit" class="w-full bg-blue-500 text-white py-3 rounded-lg text-lg font-semibold hover:bg-blue-600 transition" aria-label="Cadastrar loja">Cadastrar Loja</button>
+          <div id="store-signup-error" class="text-red-500 text-sm" aria-live="polite"></div>
+          <div id="store-signup-success" class="text-green-500 text-sm" aria-live="polite"></div>
+        </form>
+      </div>
+
+      <!-- Lista de Lojas -->
       <div id="stores-container" class="bg-white p-6 rounded-lg shadow-md">
         <h2 class="text-2xl font-semibold text-blue-900 mb-4">Suas Lojas</h2>
         <table class="w-full text-left">
@@ -58,6 +91,38 @@
           <tbody id="stores-table"></tbody>
         </table>
       </div>
+
+      <!-- Seção de Cadastro de Produtos -->
+      <section class="bg-white p-6 rounded-lg shadow-md mt-6">
+        <h2 class="text-2xl font-semibold text-blue-900 mb-4">Cadastrar Produto</h2>
+        <form id="add-product-form" class="space-y-4">
+          <select name="storeId" required class="w-full p-3 bg-white text-gray-800 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500">
+            <option value="">Selecione uma Loja</option>
+          </select>
+          <input type="text" name="nome" placeholder="Nome do Produto" required class="w-full p-3 bg-white text-gray-800 placeholder-gray-500 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500">
+          <textarea name="descricao" placeholder="Descrição do Produto" class="w-full p-3 bg-white text-gray-800 placeholder-gray-500 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"></textarea>
+          <input type="number" name="preco" placeholder="Preço (ex.: 29.90)" step="0.01" required class="w-full p-3 bg-white text-gray-800 placeholder-gray-500 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500">
+          <input type="url" name="imagem" placeholder="URL da Imagem (opcional)" class="w-full p-3 bg-white text-gray-800 placeholder-gray-500 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500">
+          <select name="categoria" required class="w-full p-3 bg-white text-gray-800 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500">
+            <option value="">Selecione uma Categoria</option>
+            <option value="Alimentos">Alimentos</option>
+            <option value="Vestuário">Vestuário</option>
+            <option value="Casa">Casa</option>
+            <option value="Eletrônicos">Eletrônicos</option>
+            <option value="Saúde">Saúde</option>
+            <option value="Presentes">Presentes</option>
+          </select>
+          <button type="submit" class="w-full bg-blue-500 text-white py-3 rounded-lg text-lg font-semibold hover:bg-blue-600 transition" aria-label="Adicionar produto">Adicionar Produto</button>
+          <div id="add-product-error" class="text-red-500 text-sm" aria-live="polite"></div>
+          <div id="add-product-success" class="text-green-500 text-sm" aria-live="polite"></div>
+        </form>
+      </section>
+
+      <!-- Seção de Produtos Cadastrados -->
+      <section class="bg-white p-6 rounded-lg shadow-md mt-6">
+        <h2 class="text-2xl font-semibold text-blue-900 mb-4">Produtos Cadastrados</h2>
+        <div id="products-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+      </section>
     </div>
   </section>
 
@@ -78,46 +143,14 @@
         <input type="text" name="bairro" placeholder="Bairro da Loja" required
           class="w-full p-3 bg-white text-gray-800 placeholder-gray-500 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500">
         <div class="flex space-x-4">
-          <button type="submit" class="w-full bg-blue-500 text-white py-3 rounded-lg text-lg font-semibold hover:bg-blue-600 transition">Salvar</button>
-          <button type="button" id="cancel-edit" class="w-full bg-gray-500 text-white py-3 rounded-lg text-lg font-semibold hover:bg-gray-600 transition">Cancelar</button>
+          <button type="submit" class="w-full bg-blue-500 text-white py-3 rounded-lg text-lg font-semibold hover:bg-blue-600 transition" aria-label="Salvar alterações">Salvar</button>
+          <button type="button" id="cancel-edit" class="w-full bg-gray-500 text-white py-3 rounded-lg text-lg font-semibold hover:bg-gray-600 transition" aria-label="Cancelar edição">Cancelar</button>
         </div>
-        <div id="edit-error" class="text-red-500 text-sm"></div>
-        <div id="edit-success" class="text-green-500 text-sm"></div>
+        <div id="edit-error" class="text-red-500 text-sm" aria-live="polite"></div>
+        <div id="edit-success" class="text-green-500 text-sm" aria-live="polite"></div>
       </form>
     </div>
   </div>
-
-<!-- Seção de Cadastro de Produtos -->
-<section class="bg-white p-6 rounded-lg shadow-md mt-6">
-  <h2 class="text-2xl font-semibold text-blue-900 mb-4">Cadastrar Produto</h2>
-  <form id="add-product-form" class="space-y-4">
-    <select name="storeId" required class="w-full p-3 bg-white text-gray-800 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500">
-      <option value="">Selecione uma Loja</option>
-    </select>
-    <input type="text" name="nome" placeholder="Nome do Produto" required class="w-full p-3 bg-white text-gray-800 placeholder-gray-500 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500">
-    <textarea name="descricao" placeholder="Descrição do Produto" class="w-full p-3 bg-white text-gray-800 placeholder-gray-500 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"></textarea>
-    <input type="number" name="preco" placeholder="Preço (ex.: 29.90)" step="0.01" required class="w-full p-3 bg-white text-gray-800 placeholder-gray-500 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500">
-    <input type="url" name="imagem" placeholder="URL da Imagem (opcional)" class="w-full p-3 bg-white text-gray-800 placeholder-gray-500 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500">
-    <select name="categoria" required class="w-full p-3 bg-white text-gray-800 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500">
-      <option value="">Selecione uma Categoria</option>
-      <option value="Alimentos">Alimentos</option>
-      <option value="Vestuário">Vestuário</option>
-      <option value="Casa">Casa</option>
-      <option value="Eletrônicos">Eletrônicos</option>
-      <option value="Saúde">Saúde</option>
-      <option value="Presentes">Presentes</option>
-    </select>
-    <button type="submit" class="w-full bg-blue-500 text-white py-3 rounded-lg text-lg font-semibold hover:bg-blue-600 transition">Adicionar Produto</button>
-    <div id="add-product-error" class="text-red-500 text-sm"></div>
-    <div id="add-product-success" class="text-green-500 text-sm"></div>
-  </form>
-</section>
-
-<!-- Seção de Produtos Cadastrados -->
-<section class="bg-white p-6 rounded-lg shadow-md mt-6">
-  <h2 class="text-2xl font-semibold text-blue-900 mb-4">Produtos Cadastrados</h2>
-  <div id="products-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-</section>
 
   <!-- Footer -->
   <footer class="bg-blue-900 text-white py-6">
@@ -134,6 +167,5 @@
       <p>© 2025 Seu Shopping Online do Bairro. Todos os direitos reservados.</p>
     </div>
   </footer>
-  <script type="module" src="/js/data/dashboard.js"></script>
 </body>
 </html>
