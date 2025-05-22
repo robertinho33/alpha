@@ -602,14 +602,15 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   console.log('Usuário é administrador, carregando dashboard');
-  if (adminNameElement) {
-      adminNameElement.textContent = `Bem-vindo, ${user.displayName || 'Admin'}`;
+  if (DOM_ELEMENTS.adminNameElement) {
+    DOM_ELEMENTS.adminNameElement.textContent = `Bem-vindo, ${user.displayName || 'Admin'}`;
   }
-  if (logoutButton) {
-      logoutButton.classList.remove('hidden');
+
+  if (DOM_ELEMENTS.logoutButton) {
+    DOM_ELEMENTS.logoutButton.classList.remove('hidden');
+}
+
+  if (DOM_ELEMENTS.authMessage) {
+      DOM_ELEMENTS.authMessage.classList.add('hidden');
   }
-  if (authMessage) {
-      authMessage.classList.add('hidden');
-  }
-  loadStores();
 });
